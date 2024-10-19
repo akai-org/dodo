@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "f-dev": "pnpm --filter dodo-frontend dev",
     "b-dev": "pnpm --filter dodo-backend start:dev",
-    "f-dev": "pnpm --filter dodo-frontend start:dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "format": "prettier --write ."
