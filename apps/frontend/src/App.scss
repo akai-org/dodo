@@ -1,0 +1,30 @@
+@use 'vars' as *;
+
+* {
+  margin: 0;
+  font-family: 'Asap', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: #fff;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #fff;
+}
+
+main {
+  display: flex;
+  height: 100vh;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 767px) {
+  .Main {
+    flex-direction: column;
+  }
+}
