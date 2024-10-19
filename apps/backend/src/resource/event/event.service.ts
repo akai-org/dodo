@@ -89,7 +89,7 @@ export class EventService {
                             exception.isCancelled &&
                             exception.originalDate <= endDate;
                         if (rescheduledConditions || cancelledConditions) {
-                            toReturn.eventExceptions!.push(exception);
+                            toReturn.eventExceptions?.push(exception);
                         }
                     });
                 }

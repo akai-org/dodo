@@ -4,10 +4,12 @@
     "require": ["tsconfig-paths/register"]
   },
   "compilerOptions": {
+    "baseUrl": ".",
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
     "allowSyntheticDefaultImports": true,
+    "strictPropertyInitialization": false,
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist"
