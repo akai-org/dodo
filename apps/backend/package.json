@@ -7,22 +7,27 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:docker": "cross-env RUNTIME=docker nest start",
     "start:dev": "cross-env RUNTIME=local nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+
     "typeorm": "typeorm-ts-node-commonjs -d ./src/config/orm.config.ts",
-    "migration-generate": "dotenv -e .local.env -- typeorm-ts-node-commonjs -d ./src/config/orm.config.ts migration:generate",
+    "migration-generate": "dotenv -e .env.local -- typeorm-ts-node-commonjs -d ./src/config/orm.config.ts migration:generate",
     "migration-create": "typeorm-ts-node-commonjs migration:create",
-    "migration-run": "npx dotenv -e .local.env -- npm run typeorm migration:run",
+    "migration-run": "npx dotenv -e .env.local -- npm run typeorm migration:run",
     "migration-revert": "npm run typeorm migration:revert"
   },
   "dependencies": {

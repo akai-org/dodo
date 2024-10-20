@@ -15,7 +15,7 @@ import { UserModule } from './resource/user/user.module';
     imports: [
         // Configs
         ConfigModule.forRoot({
-            envFilePath: `.${process.env.RUNTIME}.env`,
+            envFilePath: `.env.${process.env.RUNTIME}`,
             isGlobal: true,
             load: [AppConfig, DatabaseConfig],
         }),

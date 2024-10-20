@@ -1,0 +1,3 @@
+**/migrations/*.ts
+dist
+node_modules
