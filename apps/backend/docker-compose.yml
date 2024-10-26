@@ -43,3 +43,17 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - MYSQL_USER=${DB_USERNAME}
       - MYSQL_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u ${DB_USERNAME} --password=${DB_PASSWORD}
+      start_period: 1s
+      interval: 1s
+      timeout: 1s
+      retries: 100
+
+  test-health-check:
+    image: hello-world
+    restart: no
+    profiles: [ test ]
+    depends_on:
+      test-mysql:
+        condition: service_healthy

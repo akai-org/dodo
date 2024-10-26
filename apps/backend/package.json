@@ -17,9 +17,9 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test:db:up": "docker compose --env-file=\".env.docker.test\" --profile test up --build -d",
-    "test:db:rm": "docker compose --env-file=\".env.docker.test\" rm test-mysql -f -s -v",
+    "test:db:rm": "docker compose --env-file=\".env.docker.test\" rm test-mysql -f -s -v; docker compose --env-file=\".env.docker.test\" rm test-health-check -f -s -v",
     "test:db:restart": "pnpm test:db:rm && pnpm test:db:up",
-    "pretest": "pnpm test:db:restart && sleep 10",
+    "pretest": "pnpm test:db:restart",
     "test": "dotenv -e .env.test -- jest --runInBand --no-cache --config ./test/jest-e2e.json",
     "posttest": "pnpm test:db:rm",
 
