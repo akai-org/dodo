@@ -16,7 +16,7 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
-## Run the whole backend in docker
+## Run the whole backend in a docker container
 ```bash
 $ docker compose --env-file=".docker.env" up --build
 ```
