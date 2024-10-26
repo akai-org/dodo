@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { AuthState, AuthStore } from "./auth.store.types.ts";
 
 const initialValues: AuthState = {
-    isAuthenticated: false,
+    isAuthenticated: true,
 }
 
 const useAuthStore = create<AuthStore>()((set) =>( {

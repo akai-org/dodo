@@ -6,6 +6,7 @@ import {loginFormValidator} from "../../auth/auth.utils.ts";
 import useAuthApi from "../../api/useAuthApi.tsx";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
+import { Route } from '../../router/router.types.ts';
 
 const initialFormState = {
     email: '',
@@ -42,7 +43,7 @@ const Login: FC = (): ReactElement => {
         googleQuery.mutateAsync({token: credential})
             .then(() => {
                 toast("Login success", { type: 'success' });
-                setTimeout(() => { navigate('/home'); }, 2000);
+                setTimeout(() => { navigate(Route.HOME); }, 2000);
             })
             .catch(() => {
                 toast("Login failed", { type: 'error' });
@@ -63,7 +64,7 @@ const Login: FC = (): ReactElement => {
         loginQuery.mutateAsync(form)
             .then(() => {
                 toast("Login success", { type: 'success' });
-                setTimeout(() => { navigate('/home'); }, 2000);
+                setTimeout(() => { navigate(Route.HOME); }, 2000);
             })
             .catch(() => {
                 toast("Login failed", { type: 'error' });
