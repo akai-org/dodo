@@ -1,7 +1,20 @@
 import {LoginForm, LoginValidationErrors} from "./auth.types.ts";
+import { jwtDecode } from 'jwt-decode';
 
 export const verifyToken = (): boolean => {
-    return getAccessToken != null;
+    const token = getAccessToken();
+    if (!token) {
+        return false;
+    }
+
+    try {
+        const decodedToken = jwtDecode(token);
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        return (decodedToken.exp ?? 0) > currentTimestamp;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+        return false;
+    }
 }
 
 export const getAccessToken = () => {
