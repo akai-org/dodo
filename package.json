@@ -7,8 +7,11 @@
     "f-dev": "pnpm --filter dodo-frontend dev",
     "b-dev": "pnpm --filter dodo-backend start:dev",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:back": "pnpm --filter dodo-backend test",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "lint:back": "pnpm --filter dodo-backend lint",
+    "format": "prettier --write .",
+    "format:back": "pnpm --filter dodo-backend format:check"
   },
   "keywords": [],
   "author": "",
