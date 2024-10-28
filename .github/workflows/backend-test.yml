@@ -5,6 +5,7 @@ on:
   pull_request:
     branches: [ 'main' ]
     paths: [ 'apps/backend/**', '.github' ]
+  workflow_dispatch:
 
 jobs:
   format-lint:
