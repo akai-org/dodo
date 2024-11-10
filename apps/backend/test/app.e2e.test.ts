@@ -182,19 +182,26 @@ describe('App e2e test', () => {
     });
 
     describe('User Module', () => {
+        beforeAll(async () => {
+            await pactum
+                .spec()
+                .post('/auth/login')
+                .withBody(new AuthDTO('admin@local.host', 'admin'))
+                .stores('adminToken', 'accessToken');
+
+            await pactum
+                .spec()
+                .post('/auth/login')
+                .withBody(new AuthDTO('user@local.host', 'user'))
+                .stores('userToken', 'accessToken');
+        });
+
         describe('Get me', () => {
             it('Should fail if no token', async () => {
                 await pactum.spec().get('/users/me').expectStatus(401);
             });
 
             it('Should return correct user', async () => {
-                await pactum
-                    .spec()
-                    .post('/auth/login')
-                    .withBody(new AuthDTO('admin@local.host', 'admin'))
-                    .expectStatus(200)
-                    .stores('adminToken', 'accessToken');
-
                 await pactum
                     .spec()
                     .get('/users/me')
@@ -287,13 +294,6 @@ describe('App e2e test', () => {
             });
 
             it('Should fail if user is not an admin', async () => {
-                await pactum
-                    .spec()
-                    .post('/auth/login')
-                    .withBody(new AuthDTO('user@local.host', 'user'))
-                    .expectStatus(200)
-                    .stores('userToken', 'accessToken');
-
                 await pactum
                     .spec()
                     .get('/users/1')
@@ -903,6 +903,6 @@ describe('App e2e test', () => {
     });
 
     describe('Search Module', () => {
-        // Search module testing to add
+        it.todo('Add search module e2e tests');
     });
 });
