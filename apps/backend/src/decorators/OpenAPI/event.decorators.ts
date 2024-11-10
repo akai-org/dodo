@@ -28,6 +28,7 @@ export function GetUserEventsApi() {
 export function GetUserEventsBetweenDatesApi() {
     return applyDecorators(
         ApiOkResponse({ type: [ReturnEventWithDatesDTO] }),
+        ApiBadRequestResponse({ description: 'Dates must be a valid ISO 8601 date string' }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
     );
 }
