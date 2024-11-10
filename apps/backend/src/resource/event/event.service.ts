@@ -69,7 +69,7 @@ export class EventService {
             relations: { recurrencePattern: true, eventExceptions: true },
         });
 
-        return toFilter.reduce(
+        const filtered = toFilter.reduce(
             (filtered: ReturnEventWithDatesDTO[], event: EventEntity) => {
                 const toReturn: ReturnEventWithDatesDTO = {
                     id: event.id,
@@ -176,6 +176,8 @@ export class EventService {
             },
             [],
         );
+
+        return plainToInstance(ReturnEventWithDatesDTO, filtered);
     }
 
     async fetchExceptionById(exceptionId: number) {
