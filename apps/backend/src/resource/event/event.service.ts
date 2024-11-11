@@ -169,6 +169,27 @@ export class EventService {
                             toReturn.eventDates.push(
                                 start.toLocaleDateString(),
                             );
+                        else {
+                            const exception = event.eventExceptions?.find(
+                                (e) =>
+                                    e.originalDate.toLocaleDateString() ===
+                                    start.toLocaleDateString(),
+                            );
+                            if (
+                                exception?.isRescheduled &&
+                                !exception?.isCancelled &&
+                                (exception.startDate?.getTime() ?? 0) <
+                                    endDate.getTime() &&
+                                (exception.endDate?.getTime() ??
+                                    Number.MAX_SAFE_INTEGER) >
+                                    startDate.getTime()
+                            ) {
+                                toReturn.eventDates.push(
+                                    exception.startDate?.toLocaleDateString() ??
+                                        '',
+                                );
+                            }
+                        }
                         start = nextMonthWithDate(start, toAdd);
                     }
                     if (toReturn.eventDates.length > 0) filtered.push(toReturn);
@@ -214,6 +235,9 @@ export class EventService {
             ...exceptionDto,
             mainEventId: eventId,
         });
+        if (!(await this.eventRepository.existsBy({ id: eventId }))) {
+            throw new NotFoundException('Event not found');
+        }
         await this.exceptionRepository.insert(exception);
         return plainToInstance(ReturnEventExceptionDTO, exception);
     }
@@ -255,7 +279,7 @@ export class EventService {
             });
         this.exceptionRepository.merge(exceptionToUpdate, editExceptionDto);
         try {
-            await this.eventRepository.update(
+            await this.exceptionRepository.update(
                 { id: exceptionToUpdate.id },
                 { ...editExceptionDto },
             );
