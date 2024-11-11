@@ -8,10 +8,16 @@ import { Test } from '@nestjs/testing';
 import * as pactum from 'pactum';
 import { AppModule } from 'src/app.module';
 import { AuthDTO, RegisterDTO } from 'src/auth/dto';
-import { CreateEventDTO, EditEventDTO } from 'src/resource/event/dto';
+import {
+    CreateEventDTO,
+    CreateEventExceptionDTO,
+    EditEventDTO,
+    EditEventExceptionDTO,
+} from 'src/resource/event/dto';
 import { editNoteDTO } from 'src/resource/note/dto';
 import { CreateTaskDTO, EditTaskDTO } from 'src/resource/task/dto';
 import { EditUserDTO } from 'src/resource/user/dto';
+import { RecurrenceType } from 'src/types';
 
 describe('App e2e test', () => {
     let app: INestApplication;
@@ -215,7 +221,7 @@ describe('App e2e test', () => {
                             role: { type: 'string' },
                         },
                     })
-                    .expectJson({
+                    .expectJsonLike({
                         id: 1,
                         username: 'admin',
                         email: 'admin@local.host',
@@ -257,7 +263,7 @@ describe('App e2e test', () => {
                             role: { type: 'string' },
                         },
                     })
-                    .expectJson({
+                    .expectJsonLike({
                         id: 1,
                         username: 'admin2',
                         email: 'admin2@local.host',
@@ -271,7 +277,7 @@ describe('App e2e test', () => {
                     .get('/users/me')
                     .withBearerToken('$S{adminToken}')
                     .expectStatus(200)
-                    .expectJson({
+                    .expectJsonLike({
                         id: 1,
                         username: 'admin2',
                         email: 'admin2@local.host',
@@ -315,7 +321,7 @@ describe('App e2e test', () => {
                             role: { type: 'string' },
                         },
                     })
-                    .expectJson({
+                    .expectJsonLike({
                         id: 2,
                         username: 'user',
                         email: 'user@local.host',
@@ -532,7 +538,707 @@ describe('App e2e test', () => {
     });
 
     describe('Event Recurrence', () => {
-        // Event recurrence testing to add
+        const events = new Map<string, CreateEventDTO>([
+            [
+                'event1',
+                {
+                    name: 'event1',
+                    description: 'Event 1',
+                    startDate: new Date(2024, 2, 26),
+                    isFullDay: true,
+                },
+            ],
+            [
+                'event2',
+                {
+                    name: 'event2',
+                    description: 'Event 2',
+                    startDate: new Date(2024, 2, 3, 14),
+                    endDate: new Date(2024, 2, 3, 18),
+                    isFullDay: false,
+                },
+            ],
+            [
+                'event3',
+                {
+                    name: 'event3',
+                    description: 'Event 3',
+                    startDate: new Date(2024, 0, 2),
+                    endDate: new Date(2024, 0, 18),
+                    isFullDay: true,
+                    recurrencePattern: {
+                        recurrenceType: RecurrenceType.DAILY,
+                        separationCount: 2,
+                    },
+                },
+            ],
+            [
+                'event4',
+                {
+                    name: 'event4',
+                    description: 'Event 4',
+                    startDate: new Date(2024, 3, 22),
+                    endDate: new Date(2024, 11, 22),
+                    isFullDay: true,
+                    recurrencePattern: {
+                        recurrenceType: RecurrenceType.MONTHLY,
+                    },
+                },
+            ],
+            [
+                'event5',
+                {
+                    name: 'event5',
+                    description: 'Event 5',
+                    startDate: new Date(2024, 3, 22),
+                    isFullDay: true,
+                    recurrencePattern: {
+                        recurrenceType: RecurrenceType.WEEKLY,
+                        numberOfOccurrences: 15,
+                    },
+                },
+            ],
+            [
+                'event6',
+                {
+                    name: 'event6',
+                    description: 'Event 6',
+                    startDate: new Date(2024, 8, 11),
+                    isFullDay: true,
+                    recurrencePattern: {
+                        recurrenceType: RecurrenceType.MONTHLY,
+                        numberOfOccurrences: 6,
+                    },
+                },
+            ],
+        ]);
+
+        describe('Get events between dates', () => {
+            beforeAll(async () => {
+                for (const [key, event] of events.entries()) {
+                    await pactum
+                        .spec()
+                        .post('/events')
+                        .withBody(event)
+                        .withBearerToken('$S{adminToken}')
+                        .stores(`${key}Id`, 'id');
+                }
+            });
+
+            it('Should fail if no token', async () => {
+                await pactum.spec().get('/events/dates').expectStatus(401);
+            });
+
+            it('Should fail if no query', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(400);
+            });
+
+            it('Should fail if incorrect query', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({ startDate: 'xx', endDate: 'XX' })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(400);
+            });
+
+            it('Date scenario 1', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-03-01',
+                        endDate: '2024-03-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(2)
+                    .expect((ctx) => {
+                        for (const [key, value] of Object.entries(
+                            events.get('event1') ?? {},
+                        )) {
+                            expect(ctx.res.body[0]).toHaveProperty(key);
+                            expect(ctx.res.body[0][key]).toBe(
+                                value instanceof Date
+                                    ? value.toISOString()
+                                    : value,
+                            );
+                        }
+                        expect(ctx.res.body[0].createdById).toBe(1);
+                        expect(ctx.res.body[0].eventDates).toHaveLength(1);
+                    })
+                    .expect((ctx) => {
+                        for (const [key, value] of Object.entries(
+                            events.get('event2') ?? {},
+                        )) {
+                            expect(ctx.res.body[1]).toHaveProperty(key);
+                            expect(ctx.res.body[1][key]).toBe(
+                                value instanceof Date
+                                    ? value.toISOString()
+                                    : value,
+                            );
+                        }
+                        expect(ctx.res.body[1].createdById).toBe(1);
+                        expect(ctx.res.body[0].eventDates).toHaveLength(1);
+                    });
+            });
+
+            it('Date scenario 2', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-01-01',
+                        endDate: '2024-01-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(1)
+                    .expect((ctx) => {
+                        for (const [key, value] of Object.entries(
+                            events.get('event3') ?? {},
+                        )) {
+                            if (key === 'recurrencePattern') continue;
+                            expect(ctx.res.body[0]).toHaveProperty(key);
+                            expect(ctx.res.body[0][key]).toBe(
+                                value instanceof Date
+                                    ? value.toISOString()
+                                    : value,
+                            );
+                        }
+                        expect(ctx.res.body[0].createdById).toBe(1);
+                        expect(ctx.res.body[0].eventDates).toHaveLength(6);
+                    });
+            });
+
+            it('Date scenario 3', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-01-01',
+                        endDate: '2025-12-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(6)
+                    .expect((ctx) => {
+                        for (const [key, value] of Object.entries(
+                            events.get('event4') ?? {},
+                        )) {
+                            if (key === 'recurrencePattern') continue;
+                            expect(ctx.res.body[3]).toHaveProperty(key);
+                            expect(ctx.res.body[3][key]).toBe(
+                                value instanceof Date
+                                    ? value.toISOString()
+                                    : value,
+                            );
+                        }
+                        expect(ctx.res.body[3].createdById).toBe(1);
+                        expect(ctx.res.body[3].eventDates).toHaveLength(9);
+                    })
+                    .expect((ctx) => {
+                        for (const [key, value] of Object.entries(
+                            events.get('event5') ?? {},
+                        )) {
+                            if (key === 'recurrencePattern') continue;
+                            expect(ctx.res.body[4]).toHaveProperty(key);
+                            expect(ctx.res.body[4][key]).toBe(
+                                value instanceof Date
+                                    ? value.toISOString()
+                                    : value,
+                            );
+                        }
+                        expect(ctx.res.body[4].createdById).toBe(1);
+                        expect(ctx.res.body[4].eventDates).toHaveLength(15);
+                    });
+            });
+
+            it('Date scenario 4', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-09-01',
+                        endDate: '2025-06-30',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(2)
+                    .expect((ctx) => {
+                        for (const [key, value] of Object.entries(
+                            events.get('event6') ?? {},
+                        )) {
+                            if (key === 'recurrencePattern') continue;
+                            expect(ctx.res.body[1]).toHaveProperty(key);
+                            expect(ctx.res.body[1][key]).toBe(
+                                value instanceof Date
+                                    ? value.toISOString()
+                                    : value,
+                            );
+                        }
+                        expect(ctx.res.body[1].createdById).toBe(1);
+                        expect(ctx.res.body[1].eventDates).toHaveLength(6);
+                    });
+            });
+
+            it.todo('Maybe add more in the future');
+        });
+
+        describe('Add event recurrence', () => {
+            const dto: EditEventDTO = {
+                recurrencePattern: {
+                    recurrenceType: RecurrenceType.DAILY,
+                    numberOfOccurrences: 3,
+                },
+            };
+
+            it('Should return one occurrence', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-01-01',
+                        endDate: '2024-12-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expect((ctx) => {
+                        expect(ctx.res.body[0].eventDates).toHaveLength(1);
+                    });
+            });
+
+            it('Should successfully add event recurrence', async () => {
+                await pactum
+                    .spec()
+                    .patch('/events/$S{event1Id}')
+                    .withBody(dto)
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectBodyContains(dto.recurrencePattern?.recurrenceType);
+            });
+
+            it('Should return correct amount of occurrences', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-01-01',
+                        endDate: '2024-12-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expect((ctx) => {
+                        expect(ctx.res.body[0].eventDates).toHaveLength(3);
+                    });
+            });
+        });
+
+        describe('Edit event recurrence', () => {
+            const dto: EditEventDTO = {
+                recurrencePattern: {
+                    recurrenceType: RecurrenceType.WEEKLY,
+                    numberOfOccurrences: 2,
+                },
+            };
+
+            it('Should successfully edit event recurrence', async () => {
+                await pactum
+                    .spec()
+                    .patch('/events/$S{event1Id}')
+                    .withBody(dto)
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectBodyContains(dto.recurrencePattern?.recurrenceType);
+            });
+
+            it('Should return correct amount of occurrences', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-01-01',
+                        endDate: '2024-12-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expect((ctx) => {
+                        expect(ctx.res.body[0].eventDates).toHaveLength(2);
+                    });
+            });
+        });
+
+        describe('Remove event recurrence', () => {
+            const dto: EditEventDTO = {
+                deleteRecurrence: true,
+            };
+
+            it('Should successfully remove event recurrence', async () => {
+                await pactum
+                    .spec()
+                    .patch('/events/$S{event1Id}')
+                    .withBody(dto)
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200);
+            });
+
+            it('Should return correct amount of occurrences', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-01-01',
+                        endDate: '2024-12-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expect((ctx) => {
+                        expect(ctx.res.body[0].eventDates).toHaveLength(1);
+                    });
+            });
+        });
+
+        describe('Add event exception - reschedule', () => {
+            const dto: CreateEventExceptionDTO = {
+                isRescheduled: true,
+                isCancelled: false,
+                originalDate: new Date(2025, 0, 11),
+                startDate: new Date(2025, 0, 16),
+            };
+
+            it('Should return correct amount of occurrences - pre', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2025-01-01',
+                        endDate: '2025-01-14',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expect((ctx) => {
+                        expect(ctx.res.body[0].eventDates).toHaveLength(1);
+                    });
+            });
+
+            it('Should fail if no token', async () => {
+                await pactum
+                    .spec()
+                    .post('/events/exceptions/$S{event6Id}')
+                    .expectStatus(401);
+            });
+
+            it("Should fail if event/exception don't exist", async () => {
+                await pactum
+                    .spec()
+                    .post('/events/exceptions/9999')
+                    .withBody(dto)
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(404);
+            });
+
+            it('Should fail if no body', async () => {
+                await pactum
+                    .spec()
+                    .post('/events/exceptions/$S{event6Id}')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(400);
+            });
+
+            it('Should fail if incomplete body', async () => {
+                await pactum
+                    .spec()
+                    .post('/events/exceptions/$S{event6Id}')
+                    .withBody({
+                        isCancelled: dto.isCancelled,
+                        originalDate: dto.originalDate,
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(400);
+            });
+
+            it('Should add event exception', async () => {
+                await pactum
+                    .spec()
+                    .post('/events/exceptions/$S{event6Id}')
+                    .withBody(dto)
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(201)
+                    .expectJsonSchema({
+                        properties: {
+                            id: { type: 'number' },
+                            isCancelled: { type: 'boolean' },
+                            isRescheduled: { type: 'boolean' },
+                            originalDate: { type: 'string' },
+                        },
+                    })
+                    .expectJsonLike({
+                        ...dto,
+                        originalDate: dto.originalDate.toISOString(),
+                        startDate: dto.startDate?.toISOString(),
+                    })
+                    .stores('event6ExceptionId', 'id');
+            });
+
+            it('Should return correct exception', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/exceptions/$S{event6ExceptionId}')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLike({
+                        ...dto,
+                        originalDate: dto.originalDate.toISOString(),
+                        startDate: dto.startDate?.toISOString(),
+                    });
+            });
+
+            it('Should return correct amount of occurrences - post', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2025-01-01',
+                        endDate: '2025-01-14',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(0);
+            });
+        });
+
+        describe('Add event exception - cancel', () => {
+            const dto: CreateEventExceptionDTO = {
+                isRescheduled: false,
+                isCancelled: true,
+                originalDate: new Date(2024, 0, 5),
+            };
+
+            it('Should return correct amount of occurrences - pre', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-01-01',
+                        endDate: '2024-01-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expect((ctx) => {
+                        expect(ctx.res.body[0].eventDates).toHaveLength(6);
+                    });
+            });
+
+            it('Should add event exception', async () => {
+                await pactum
+                    .spec()
+                    .post('/events/exceptions/$S{event3Id}')
+                    .withBody(dto)
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(201)
+                    .expectJsonSchema({
+                        properties: {
+                            id: { type: 'number' },
+                            isCancelled: { type: 'boolean' },
+                            isRescheduled: { type: 'boolean' },
+                            originalDate: { type: 'string' },
+                        },
+                    })
+                    .expectJsonLike({
+                        ...dto,
+                        originalDate: dto.originalDate.toISOString(),
+                    })
+                    .stores('event3ExceptionId', 'id');
+            });
+
+            it('Should return correct exception', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/exceptions/$S{event3ExceptionId}')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLike({
+                        ...dto,
+                        originalDate: dto.originalDate.toISOString(),
+                    });
+            });
+
+            it('Should return correct amount of occurrences - post', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2024-01-01',
+                        endDate: '2024-01-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expect((ctx) => {
+                        expect(ctx.res.body[0].eventDates).toHaveLength(5);
+                    });
+            });
+        });
+
+        describe('Get event exception', () => {
+            const dto: CreateEventExceptionDTO = {
+                isRescheduled: true,
+                isCancelled: false,
+                originalDate: new Date(2025, 0, 11),
+                startDate: new Date(2025, 0, 16),
+            };
+
+            it('Should fail if no token', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/exceptions/$S{event6ExceptionId}')
+                    .expectStatus(401);
+            });
+
+            it('Should return correct event exception', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/exceptions/$S{event6ExceptionId}')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonSchema({
+                        properties: {
+                            id: { type: 'number' },
+                            isCancelled: { type: 'boolean' },
+                            isRescheduled: { type: 'boolean' },
+                            originalDate: { type: 'string' },
+                            startDate: { type: 'string' },
+                        },
+                    })
+                    .expectJsonLike({
+                        ...dto,
+                        originalDate: dto.originalDate.toISOString(),
+                        startDate: dto.startDate?.toISOString(),
+                    });
+            });
+        });
+
+        describe('Edit event exception', () => {
+            const dto: EditEventExceptionDTO = {
+                isCancelled: true,
+            };
+
+            it('Should return correct amount of occurrences - pre', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2025-01-01',
+                        endDate: '2025-01-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(1)
+                    .expect((ctx) => {
+                        expect(ctx.res.body[0].eventDates).toHaveLength(1);
+                    });
+            });
+
+            it('Should fail if no token', async () => {
+                await pactum
+                    .spec()
+                    .patch('/events/exceptions/$S{event6ExceptionId}')
+                    .expectStatus(401);
+            });
+
+            it("Should fail if event doesn't exist", async () => {
+                await pactum
+                    .spec()
+                    .patch('/events/exceptions/9999')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(404);
+            });
+
+            it('Should fail if no body', async () => {
+                await pactum
+                    .spec()
+                    .patch('/events/exceptions/$S{event6ExceptionId}')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(400);
+            });
+
+            it('Should successfully edit event exception', async () => {
+                await pactum
+                    .spec()
+                    .patch('/events/exceptions/$S{event6ExceptionId}')
+                    .withBody(dto)
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectBodyContains(dto.isCancelled);
+            });
+
+            it('Should return correct amount of occurrences - post', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2025-01-01',
+                        endDate: '2025-01-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(0);
+            });
+        });
+
+        describe('Delete event exception', () => {
+            it('Should return correct amount of occurrences - pre', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2025-01-01',
+                        endDate: '2025-01-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(0);
+            });
+
+            it('Should fail if no token', async () => {
+                await pactum
+                    .spec()
+                    .delete('/events/exceptions/$S{event6ExceptionId}')
+                    .expectStatus(401);
+            });
+
+            it('Should successfully delete event exception', async () => {
+                await pactum
+                    .spec()
+                    .delete('/events/exceptions/$S{event6ExceptionId}')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(204);
+            });
+
+            it('Should return no exceptions', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/exceptions/$S{event6ExceptionId}')
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(404);
+            });
+
+            it('Should return correct amount of occurrences - post', async () => {
+                await pactum
+                    .spec()
+                    .get('/events/dates')
+                    .withQueryParams({
+                        startDate: '2025-01-01',
+                        endDate: '2025-01-31',
+                    })
+                    .withBearerToken('$S{adminToken}')
+                    .expectStatus(200)
+                    .expectJsonLength(1);
+            });
+        });
     });
 
     describe('Note Module', () => {
