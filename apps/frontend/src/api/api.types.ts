@@ -1,10 +1,7 @@
-export const API_PORT = 5000;
-export const API_ADDRESS = `http://localhost:${API_PORT}`;
-
 export enum AUTH_ENDPOINTS {
-    LOGIN = '/login',
-    LOGIN_GOOGLE = '/google/login',
-    CURRENT_USER = '/currentUser',
+    LOGIN = '/auth/login',
+    LOGIN_GOOGLE = '/auth/google/login',
+    CURRENT_USER = '/users/me',
 }
 
 export interface LoginResponse {
