@@ -11,18 +11,19 @@ interface GuardProps {
 const Guard: FC<GuardProps> = ({ children }): ReactElement => {
     const location = useLocation();
     const isLogin = location.pathname === Route.LOGIN;
-    const { isAuthenticated, setIsAuthenticated } = useAuthStore();
+    const {isAuthenticated, setIsAuthenticated } = useAuthStore();
     const hasCheckedToken = useRef(false);
 
     useEffect(() => {
         if (!isAuthenticated && !hasCheckedToken.current) {
             hasCheckedToken.current = true; // to prevent loop
             const tokenIsValid = verifyToken();
+
             if (tokenIsValid) {
                 setIsAuthenticated(true);
             }
         }
-    }, [isAuthenticated, setIsAuthenticated]);
+    }, [isAuthenticated]);
 
     if (isLogin && isAuthenticated) {
         return <Navigate to={Route.HOME} state={{ from: location }} replace />;

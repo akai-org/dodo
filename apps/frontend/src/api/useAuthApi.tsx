@@ -21,15 +21,22 @@ const useAuthApi = () => {
             }
         );
 
-    const useCurrentUser = () =>
-        useQuery<User>([
-            "user",
-            async () => {
-                const response = await axios.get(AUTH_ENDPOINTS.CURRENT_USER);
-                return await handleResponse(response);
-            }
-            ]
-        );
+    const useCurrentUser = () => {
+        return useQuery<User, Error>({
+            queryKey: ['user'],
+            queryFn: async () => {
+                    const response = await axios.get<User>(AUTH_ENDPOINTS.CURRENT_USER);
+                    if (response.status === 200 && response.data) {
+                        return response.data;
+                    } else {
+                        throw new Error('Failed to fetch user data');
+                    }
+            },
+            staleTime: 1000 * 60 * 5, // 5 minutes
+            refetchOnWindowFocus: false,
+        });
+    };
+
 
     const handleResponse = (res: AxiosResponse<LoginResponse>): Promise<LoginResponse> => {
        return new Promise<never>((resolve, reject) => {
