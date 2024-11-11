@@ -72,7 +72,7 @@ export class EventController {
         return await this.eventService.fetchById(eventId);
     }
 
-    @Get('except/:id')
+    @Get('exceptions/:id')
     @GetEventExceptionByIdApi()
     async getEventExceptionById(@Param('id') exceptionId: number) {
         return await this.eventService.fetchExceptionById(exceptionId);
