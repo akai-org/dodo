@@ -100,6 +100,8 @@ export class EventService {
                 }
 
                 if (event.recurrencePattern == null) {
+                    if (event.startDate < startDate) return filtered;
+
                     toReturn.eventDates.push(
                         new Date(event.startDate).toLocaleDateString(),
                     );
@@ -199,6 +201,11 @@ export class EventService {
             createdById: userId,
         });
         await this.eventRepository.insert(event);
+        if (event.recurrencePattern !== undefined)
+            await this.recurrenceRepository.insert({
+                ...event.recurrencePattern,
+                eventId: event.id,
+            });
         return plainToInstance(ReturnEventDTO, event);
     }
 
