@@ -28,7 +28,9 @@ export function GetUserEventsApi() {
 export function GetUserEventsBetweenDatesApi() {
     return applyDecorators(
         ApiOkResponse({ type: [ReturnEventWithDatesDTO] }),
-        ApiBadRequestResponse({ description: 'Dates must be a valid ISO 8601 date string' }),
+        ApiBadRequestResponse({
+            description: 'Dates must be a valid ISO 8601 date string',
+        }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
     );
 }
@@ -64,6 +66,7 @@ export function AddEventExceptionApi() {
         ApiCreatedResponse({ type: ReturnEventExceptionDTO }),
         ApiBadRequestResponse({ description: 'Invalid body' }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiNotFoundResponse({ description: 'Event not found' }),
         ApiBody({ type: CreateEventExceptionDTO }),
     );
 }
