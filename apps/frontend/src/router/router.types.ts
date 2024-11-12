@@ -1,7 +1,7 @@
 export enum Route {
-    BASE = "/",
-    HOME = "/home",
-    CALENDAR = "/calendar",
+    BASE = '/',
+    HOME = '/home',
+    CALENDAR = '/calendar',
     TODOLIST = '/todolist',
     CATEGORIES = '/categories',
     NOTES = '/notes',
@@ -11,9 +11,9 @@ export enum Route {
 }
 
 export enum SETTINGS_PATH {
-    THEMES= "/themes",
-    CALENDAR = "/calendar",
-    TODOLIST = "/todolist",
-    NOTES = "/notes",
-    PROFILE = "/profile",
+    THEMES= '/themes',
+    CALENDAR = '/calendar',
+    TODOLIST = '/todolist',
+    NOTES = '/notes',
+    PROFILE = '/profile',
 }

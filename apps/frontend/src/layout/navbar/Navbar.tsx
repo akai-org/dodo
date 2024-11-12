@@ -10,7 +10,7 @@ import { RiMenuFill } from "react-icons/ri";
 import { RiCloseFill } from "react-icons/ri";
 import { RiCheckboxBlankCircleLine } from "react-icons/ri";
 import {Route} from "../../router/router.types.ts";
-import { User } from '../../api/api.types.ts';
+import useAuthApi from '../../api/useAuthApi.tsx';
 
 
 
@@ -50,12 +50,10 @@ const initializeMenu = (): Mode => {
     else return translateMenuObject(0)!;
 };
 
-export interface NavbarProps {
-    user: User;
-}
-
-const Navbar = ({user}: NavbarProps) => {
+const Navbar = () => {
     const location = window.location;
+    const { useCurrentUser } = useAuthApi();
+    const { data: user } = useCurrentUser();
 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [mode, setMode] = useState<Mode>(initializeMenu());
