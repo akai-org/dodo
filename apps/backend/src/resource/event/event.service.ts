@@ -231,15 +231,19 @@ export class EventService {
     }
 
     async addException(eventId: number, exceptionDto: CreateEventExceptionDTO) {
-        const exception = this.exceptionRepository.create({
-            ...exceptionDto,
-            mainEventId: eventId,
-        });
-        if (!(await this.eventRepository.existsBy({ id: eventId }))) {
-            throw new NotFoundException('Event not found');
-        }
-        await this.exceptionRepository.insert(exception);
-        return plainToInstance(ReturnEventExceptionDTO, exception);
+        return await this.eventRepository
+            .findOneByOrFail({ id: eventId })
+            .then(async () => {
+                const exception = this.exceptionRepository.create({
+                    ...exceptionDto,
+                    mainEventId: eventId,
+                });
+                await this.exceptionRepository.insert(exception);
+                return plainToInstance(ReturnEventExceptionDTO, exception);
+            })
+            .catch(() => {
+                throw new NotFoundException('Event not found');
+            });
     }
 
     async edit(eventId: number, editEventDto: EditEventDTO) {
@@ -278,18 +282,17 @@ export class EventService {
                 throw new NotFoundException('Exception not found');
             });
         this.exceptionRepository.merge(exceptionToUpdate, editExceptionDto);
-        try {
-            await this.exceptionRepository.update(
-                { id: exceptionToUpdate.id },
-                { ...editExceptionDto },
-            );
-        } catch (error) {
-            if (error instanceof UpdateValuesMissingError) {
-                throw new BadRequestException('Invalid body');
-            }
-            throw error;
-        }
-        return plainToInstance(ReturnEventExceptionDTO, exceptionToUpdate);
+        return await this.exceptionRepository
+            .update({ id: exceptionToUpdate.id }, { ...editExceptionDto })
+            .then(() =>
+                plainToInstance(ReturnEventExceptionDTO, exceptionToUpdate),
+            )
+            .catch((error) => {
+                if (error instanceof UpdateValuesMissingError) {
+                    throw new BadRequestException('Invalid body');
+                }
+                throw error;
+            });
     }
 
     async delete(eventId: number) {

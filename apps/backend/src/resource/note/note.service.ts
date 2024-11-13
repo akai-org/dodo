@@ -35,13 +35,13 @@ export class NoteService {
     }
 
     async edit(id: number, noteDto: editNoteDTO) {
-        try {
-            await this.noteRepository.update({ id }, { ...noteDto });
-        } catch (error) {
-            if (error instanceof UpdateValuesMissingError)
-                throw new BadRequestException('Invalid body');
+        await this.noteRepository
+            .update({ id }, { ...noteDto })
+            .catch((error) => {
+                if (error instanceof UpdateValuesMissingError)
+                    throw new BadRequestException('Invalid body');
 
-            throw error;
-        }
+                throw error;
+            });
     }
 }

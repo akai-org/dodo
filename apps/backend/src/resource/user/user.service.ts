@@ -26,22 +26,16 @@ export class UserService {
             });
 
         this.userRepository.merge(userToUpdate, editUserDto);
-        try {
-            await this.userRepository.update(
-                {
-                    id: userId,
-                },
-                {
-                    ...editUserDto,
-                },
-            );
-        } catch (error) {
-            if (error instanceof UpdateValuesMissingError) {
-                throw new BadRequestException('Invalid body');
-            }
-            throw error;
-        }
-        return plainToInstance(ReturnUserDTO, userToUpdate);
+
+        return await this.userRepository
+            .update({ id: userId }, { ...editUserDto })
+            .then(() => plainToInstance(ReturnUserDTO, userToUpdate))
+            .catch((error) => {
+                if (error instanceof UpdateValuesMissingError) {
+                    throw new BadRequestException('Invalid body');
+                }
+                throw error;
+            });
     }
 
     async getUserById(userId: number) {
