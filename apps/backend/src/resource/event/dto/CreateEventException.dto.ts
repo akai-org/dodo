@@ -33,7 +33,7 @@ export class CreateEventExceptionDTO {
     endDate?: Date;
 
     @IsBoolean()
-    @IsNotEmpty()
+    @IsOptional()
     @ApiProperty()
-    isFullDay: boolean;
+    isFullDay?: boolean;
 }

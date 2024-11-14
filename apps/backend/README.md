@@ -1,7 +1,7 @@
 ## Installation
 
 ```bash
-$ npm install
+$ pnpm install
 ```
 
 ## Running the app
@@ -16,9 +16,8 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
-
+## Run the whole backend in a docker container
 ```bash
-# Run whole backend in docker
 $ docker compose --env-file=".docker.env" up --build
 ```
 

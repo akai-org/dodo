@@ -8,3 +8,4 @@ export * from './CreateEventException.dto';
 export * from './EditEvent.dto';
 export * from './EditEventRecurrence.dto';
 export * from './EditEventException.dto';
+export * from './EventDates.dto';

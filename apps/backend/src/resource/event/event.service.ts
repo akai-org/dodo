@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { EventEntity } from 'src/database/entities/event.entity';
@@ -21,6 +25,7 @@ import {
     MoreThanOrEqual,
     Or,
     Repository,
+    UpdateValuesMissingError,
 } from 'typeorm';
 
 @Injectable()
@@ -64,7 +69,7 @@ export class EventService {
             relations: { recurrencePattern: true, eventExceptions: true },
         });
 
-        return toFilter.reduce(
+        const filtered = toFilter.reduce(
             (filtered: ReturnEventWithDatesDTO[], event: EventEntity) => {
                 const toReturn: ReturnEventWithDatesDTO = {
                     id: event.id,
@@ -95,6 +100,8 @@ export class EventService {
                 }
 
                 if (event.recurrencePattern == null) {
+                    if (event.startDate < startDate) return filtered;
+
                     toReturn.eventDates.push(
                         new Date(event.startDate).toLocaleDateString(),
                     );
@@ -162,6 +169,27 @@ export class EventService {
                             toReturn.eventDates.push(
                                 start.toLocaleDateString(),
                             );
+                        else {
+                            const exception = event.eventExceptions?.find(
+                                (e) =>
+                                    e.originalDate.toLocaleDateString() ===
+                                    start.toLocaleDateString(),
+                            );
+                            if (
+                                exception?.isRescheduled &&
+                                !exception?.isCancelled &&
+                                (exception.startDate?.getTime() ?? 0) <
+                                    endDate.getTime() &&
+                                (exception.endDate?.getTime() ??
+                                    Number.MAX_SAFE_INTEGER) >
+                                    startDate.getTime()
+                            ) {
+                                toReturn.eventDates.push(
+                                    exception.startDate?.toLocaleDateString() ??
+                                        '',
+                                );
+                            }
+                        }
                         start = nextMonthWithDate(start, toAdd);
                     }
                     if (toReturn.eventDates.length > 0) filtered.push(toReturn);
@@ -171,6 +199,8 @@ export class EventService {
             },
             [],
         );
+
+        return plainToInstance(ReturnEventWithDatesDTO, filtered);
     }
 
     async fetchExceptionById(exceptionId: number) {
@@ -192,16 +222,28 @@ export class EventService {
             createdById: userId,
         });
         await this.eventRepository.insert(event);
+        if (event.recurrencePattern !== undefined)
+            await this.recurrenceRepository.insert({
+                ...event.recurrencePattern,
+                eventId: event.id,
+            });
         return plainToInstance(ReturnEventDTO, event);
     }
 
     async addException(eventId: number, exceptionDto: CreateEventExceptionDTO) {
-        const exception = this.exceptionRepository.create({
-            ...exceptionDto,
-            mainEventId: eventId,
-        });
-        await this.exceptionRepository.insert(exception);
-        return plainToInstance(ReturnEventExceptionDTO, exception);
+        return await this.eventRepository
+            .findOneByOrFail({ id: eventId })
+            .then(async () => {
+                const exception = this.exceptionRepository.create({
+                    ...exceptionDto,
+                    mainEventId: eventId,
+                });
+                await this.exceptionRepository.insert(exception);
+                return plainToInstance(ReturnEventExceptionDTO, exception);
+            })
+            .catch(() => {
+                throw new NotFoundException('Event not found');
+            });
     }
 
     async edit(eventId: number, editEventDto: EditEventDTO) {
@@ -240,11 +282,17 @@ export class EventService {
                 throw new NotFoundException('Exception not found');
             });
         this.exceptionRepository.merge(exceptionToUpdate, editExceptionDto);
-        await this.eventRepository.update(
-            { id: exceptionToUpdate.id },
-            { ...editExceptionDto },
-        );
-        return plainToInstance(ReturnEventExceptionDTO, exceptionToUpdate);
+        return await this.exceptionRepository
+            .update({ id: exceptionToUpdate.id }, { ...editExceptionDto })
+            .then(() =>
+                plainToInstance(ReturnEventExceptionDTO, exceptionToUpdate),
+            )
+            .catch((error) => {
+                if (error instanceof UpdateValuesMissingError) {
+                    throw new BadRequestException('Invalid body');
+                }
+                throw error;
+            });
     }
 
     async delete(eventId: number) {

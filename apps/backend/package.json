@@ -12,18 +12,16 @@
     "start:dev": "cross-env RUNTIME=local nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-
-    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
-    "format:fix": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-
+    "format": "prettier --check \"{src,test}/**/*.ts\"",
+    "format:fix": "prettier --write \"{src,test}/**/*.ts\"",
+    "lint": "eslint \"{src,test}/**/*\"",
+    "lint:fix": "eslint \"{src,test}/**/*\" --fix",
+    "test:db:up": "docker compose --env-file=\".env.docker.test\" --profile test up --build -d",
+    "test:db:rm": "docker compose --env-file=\".env.docker.test\" rm test-mysql -f -s -v; docker compose --env-file=\".env.docker.test\" rm test-health-check -f -s -v",
+    "test:db:start": "pnpm test:db:rm && pnpm test:db:up",
+    "pretest": "pnpm test:db:start",
+    "test": "dotenv -e .env.test -- jest --runInBand --no-cache --config ./test/jest-e2e.json || :",
+    "posttest": "pnpm test:db:rm",
     "typeorm": "typeorm-ts-node-commonjs -d ./src/config/orm.config.ts",
     "migration-generate": "dotenv -e .env.local -- typeorm-ts-node-commonjs -d ./src/config/orm.config.ts migration:generate",
     "migration-create": "typeorm-ts-node-commonjs migration:create",
@@ -56,7 +54,7 @@
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
-    "@nestjs/testing": "^10.0.0",
+    "@nestjs/testing": "^10.4.5",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
@@ -67,6 +65,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.5.0",
+    "pactum": "^3.7.1",
     "prettier": "^3.0.0",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
@@ -83,6 +82,9 @@
       "ts"
     ],
     "rootDir": "src",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"

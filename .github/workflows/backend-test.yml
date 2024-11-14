@@ -1,0 +1,32 @@
+name: Backend CI
+on:
+  pull_request:
+    branches: [ 'main' ]
+    paths: [ 'apps/backend/**', '.github' ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.17
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install
+      - name: Format check backend
+        run: pnpm format:back
+      - name: Lint check backend
+        run: pnpm lint:back
+      - name: Build backend
+        run: pnpm build
+        working-directory: apps/backend
+      - name: Test backend
+        run: pnpm test:back

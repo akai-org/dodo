@@ -1,39 +1,52 @@
 import react from 'eslint-plugin-react';
-import prettierPlugin from 'eslint-plugin-prettier';
-import typescript from '@typescript-eslint/eslint-plugin';
-import parser from '@typescript-eslint/parser';
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 
 export default tseslint.config(
+    {
+        ignores: [
+            '**/node_modules/',
+            '**/dist/',
+            '**/coverage/',
+            '**/*.d.ts',
+            '**/migrations/*.ts',
+        ]
+    },
     eslint.configs.recommended,
     ...tseslint.configs.strict,
     ...tseslint.configs.stylistic,
+    {
+        rules: {
+            '@typescript-eslint/no-extraneous-class': [
+                'error',
+                {
+                    allowWithDecorator: true,
+                },
+            ]
+        }
+    },
     prettierConfig,
     {
-        files: ['**/*.ts', '**/*.tsx'],
-        ignores: [
-            'node_modules/**',
-            'dist/**',
-            'coverage/**',
-            '**/*.d.ts',
-            '**/migrations/*.ts',
-        ],
+        files: ['apps/frontend/**/*.{ts,tsx}'],
+        ignores: ['**/node_modules/'],
         languageOptions: {
-            parser,
-            ecmaVersion: 'latest',
+            ecmaVersion: 2020,
             sourceType: 'module',
         },
         plugins: {
-            '@typescript-eslint': typescript,
-            prettier: prettierPlugin,
             react,
+            'react-hooks': reactHooks,
+            'react-refresh': reactRefresh,
         },
         rules: {
-            '@typescript-eslint/no-extraneous-class': 'off',
-            'react/jsx-uses-react': 'error', // Ensure React variables are used properly
-            'react/jsx-uses-vars': 'error', // Prevent React components from being incorrectly marked as unused
+            ...reactHooks.configs.recommended.rules,
+            'react-refresh/only-export-components': [
+                'warn',
+                { allowConstantExport: true },
+            ],
         },
     }
 );

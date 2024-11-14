@@ -27,8 +27,8 @@ export class EventExceptionEntity {
     @Column({ nullable: true, name: 'end_date', type: 'datetime' })
     endDate?: Date;
 
-    @Column({ name: 'is_full_day', type: 'boolean' })
-    isFullDay: boolean;
+    @Column({ nullable: true, name: 'is_full_day', type: 'boolean' })
+    isFullDay?: boolean;
 
     @Column({ name: 'event_id' })
     mainEventId: number;

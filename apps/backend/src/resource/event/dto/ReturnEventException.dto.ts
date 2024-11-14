@@ -18,17 +18,17 @@ export class ReturnEventExceptionDTO {
     @Expose()
     originalDate: Date;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     startDate?: Date;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
     endDate?: Date;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
     @Expose()
-    isFullDay: boolean;
+    isFullDay?: boolean;
 
     @ApiProperty()
     @Expose()

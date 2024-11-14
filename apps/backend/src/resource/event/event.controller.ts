@@ -35,6 +35,7 @@ import {
     CreateEventExceptionDTO,
     EditEventDTO,
     EditEventExceptionDTO,
+    EventDatesDTO,
 } from 'src/resource/event/dto';
 import { EventService } from 'src/resource/event/event.service';
 
@@ -56,13 +57,12 @@ export class EventController {
     @GetUserEventsBetweenDatesApi()
     async getUserEventsBetweenDates(
         @GetUser('id') userId: number,
-        @Query('startDate') startDate: Date,
-        @Query('endDate') endDate: Date,
+        @Query() query: EventDatesDTO,
     ) {
         return await this.eventService.fetchBetweenDates(
             userId,
-            new Date(startDate),
-            new Date(endDate),
+            new Date(query.startDate),
+            new Date(query.endDate),
         );
     }
 
@@ -72,7 +72,7 @@ export class EventController {
         return await this.eventService.fetchById(eventId);
     }
 
-    @Get('except/:id')
+    @Get('exceptions/:id')
     @GetEventExceptionByIdApi()
     async getEventExceptionById(@Param('id') exceptionId: number) {
         return await this.eventService.fetchExceptionById(exceptionId);
