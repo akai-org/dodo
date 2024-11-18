@@ -208,6 +208,7 @@ export class EventService {
             .findOneByOrFail({ id: exceptionId })
             .then(async (exception) => {
                 await this.eventRepository.findOneByOrFail({
+                    id: exception.mainEventId,
                     createdById: userId,
                 });
                 return plainToInstance(ReturnEventExceptionDTO, exception);
@@ -287,6 +288,7 @@ export class EventService {
             })
             .then(async (exception) => {
                 await this.eventRepository.findOneByOrFail({
+                    id: exception.mainEventId,
                     createdById: userId,
                 });
                 return exception;
@@ -325,8 +327,9 @@ export class EventService {
             .findOneOrFail({
                 where: { id: exceptionId },
             })
-            .then(async () => {
+            .then(async (exception) => {
                 await this.eventRepository.findOneByOrFail({
+                    id: exception.mainEventId,
                     createdById: userId,
                 });
                 await this.exceptionRepository.delete({ id: exceptionId });
