@@ -1543,6 +1543,14 @@ describe('App e2e test', () => {
                 await pactum.spec().get('/tasks/1').expectStatus(401);
             });
 
+            it('Should fail if incorrect user', async () => {
+                await pactum
+                    .spec()
+                    .get('/tasks/1')
+                    .withBearerToken('$S{userToken}')
+                    .expectStatus(404);
+            });
+
             it('Should fail if task not found', async () => {
                 await pactum
                     .spec()
@@ -1578,6 +1586,15 @@ describe('App e2e test', () => {
 
             it('Should fail if no token', async () => {
                 await pactum.spec().patch('/tasks/1').expectStatus(401);
+            });
+
+            it('Should fail if incorrect user', async () => {
+                await pactum
+                    .spec()
+                    .patch('/tasks/1')
+                    .withBearerToken('$S{userToken}')
+                    .withBody(dto)
+                    .expectStatus(404);
             });
 
             it('Should fail if no body', async () => {
@@ -1664,6 +1681,14 @@ describe('App e2e test', () => {
         describe('Delete task', () => {
             it('Should fail if no token', async () => {
                 await pactum.spec().delete('/tasks/1').expectStatus(401);
+            });
+
+            it('Should fail if incorrect user', async () => {
+                await pactum
+                    .spec()
+                    .delete('/tasks/1')
+                    .withBearerToken('$S{userToken}')
+                    .expectStatus(404);
             });
 
             it('Should fail if task not found', async () => {
