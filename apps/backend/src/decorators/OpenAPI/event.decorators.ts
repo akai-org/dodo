@@ -3,6 +3,7 @@ import {
     ApiBadRequestResponse,
     ApiBody,
     ApiCreatedResponse,
+    ApiForbiddenResponse,
     ApiNoContentResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
@@ -39,6 +40,7 @@ export function GetEventByIdApi() {
     return applyDecorators(
         ApiOkResponse({ type: ReturnEventDTO }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiForbiddenResponse({ description: 'Forbidden' }),
         ApiNotFoundResponse({ description: 'Event not found' }),
     );
 }
@@ -47,6 +49,7 @@ export function GetEventExceptionByIdApi() {
     return applyDecorators(
         ApiOkResponse({ type: ReturnEventExceptionDTO }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiForbiddenResponse({ description: 'Forbidden' }),
         ApiNotFoundResponse({ description: 'Exception not found' }),
     );
 }
@@ -66,6 +69,7 @@ export function AddEventExceptionApi() {
         ApiCreatedResponse({ type: ReturnEventExceptionDTO }),
         ApiBadRequestResponse({ description: 'Invalid body' }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiForbiddenResponse({ description: 'Forbidden' }),
         ApiNotFoundResponse({ description: 'Event not found' }),
         ApiBody({ type: CreateEventExceptionDTO }),
     );
@@ -76,6 +80,7 @@ export function EditEventApi() {
         ApiOkResponse({ type: ReturnEventDTO }),
         ApiBadRequestResponse({ description: 'Invalid body' }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiForbiddenResponse({ description: 'Forbidden' }),
         ApiNotFoundResponse({ description: "Event doesn't exist" }),
         ApiBody({ type: EditEventDTO }),
     );
@@ -86,6 +91,7 @@ export function EditExceptionApi() {
         ApiOkResponse({ type: ReturnEventExceptionDTO }),
         ApiBadRequestResponse({ description: 'Invalid body' }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiForbiddenResponse({ description: 'Forbidden' }),
         ApiNotFoundResponse({ description: "Exception doesn't exist" }),
         ApiBody({ type: EditEventExceptionDTO }),
     );
@@ -95,6 +101,8 @@ export function DeleteEventApi() {
     return applyDecorators(
         ApiNoContentResponse(),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiForbiddenResponse({ description: 'Forbidden' }),
+        ApiNotFoundResponse({ description: 'Event not found' }),
     );
 }
 
@@ -102,5 +110,7 @@ export function DeleteExceptionApi() {
     return applyDecorators(
         ApiNoContentResponse(),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiForbiddenResponse({ description: 'Forbidden' }),
+        ApiNotFoundResponse({ description: 'Exception not found' }),
     );
 }

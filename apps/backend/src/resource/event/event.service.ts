@@ -1,5 +1,6 @@
 import {
     BadRequestException,
+    ForbiddenException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
@@ -39,16 +40,20 @@ export class EventService {
         private readonly exceptionRepository: Repository<EventExceptionEntity>,
     ) {}
 
-    async fetchById(eventId: number) {
-        return await this.eventRepository
+    async fetchById(userId: number, eventId: number) {
+        const event = await this.eventRepository
             .findOneOrFail({
                 where: { id: eventId },
                 relations: { recurrencePattern: true },
             })
-            .then((event) => plainToInstance(ReturnEventDTO, event))
             .catch(() => {
                 throw new NotFoundException('Event not found');
             });
+
+        if (event.createdById !== userId)
+            throw new ForbiddenException('Forbidden');
+
+        return plainToInstance(ReturnEventDTO, event);
     }
 
     async fetchByUser(userId: number) {
@@ -203,17 +208,19 @@ export class EventService {
         return plainToInstance(ReturnEventWithDatesDTO, filtered);
     }
 
-    async fetchExceptionById(exceptionId: number) {
-        return await this.exceptionRepository
-            .findOneByOrFail({
-                id: exceptionId,
+    async fetchExceptionById(userId: number, exceptionId: number) {
+        const exception = await this.exceptionRepository
+            .findOneOrFail({
+                where: { id: exceptionId },
+                relations: { mainEvent: true },
             })
-            .then((exception) =>
-                plainToInstance(ReturnEventExceptionDTO, exception),
-            )
             .catch(() => {
                 throw new NotFoundException('Exception not found');
             });
+
+        if (exception.mainEvent.createdById !== userId)
+            throw new ForbiddenException('Forbidden');
+        return plainToInstance(ReturnEventExceptionDTO, exception);
     }
 
     async add(userId: number, eventDto: CreateEventDTO) {
@@ -230,23 +237,29 @@ export class EventService {
         return plainToInstance(ReturnEventDTO, event);
     }
 
-    async addException(eventId: number, exceptionDto: CreateEventExceptionDTO) {
-        return await this.eventRepository
+    async addException(
+        userId: number,
+        eventId: number,
+        exceptionDto: CreateEventExceptionDTO,
+    ) {
+        const event = await this.eventRepository
             .findOneByOrFail({ id: eventId })
-            .then(async () => {
-                const exception = this.exceptionRepository.create({
-                    ...exceptionDto,
-                    mainEventId: eventId,
-                });
-                await this.exceptionRepository.insert(exception);
-                return plainToInstance(ReturnEventExceptionDTO, exception);
-            })
             .catch(() => {
                 throw new NotFoundException('Event not found');
             });
+
+        if (event.createdById !== userId)
+            throw new ForbiddenException('Forbidden');
+
+        const exception = this.exceptionRepository.create({
+            ...exceptionDto,
+            mainEventId: eventId,
+        });
+        await this.exceptionRepository.insert(exception);
+        return plainToInstance(ReturnEventExceptionDTO, exception);
     }
 
-    async edit(eventId: number, editEventDto: EditEventDTO) {
+    async edit(userId: number, eventId: number, editEventDto: EditEventDTO) {
         const eventToUpdate = await this.eventRepository
             .findOneOrFail({
                 where: { id: eventId },
@@ -254,6 +267,9 @@ export class EventService {
             .catch(() => {
                 throw new NotFoundException('Event not found');
             });
+
+        if (eventToUpdate.createdById !== userId)
+            throw new ForbiddenException('Forbidden');
 
         if (editEventDto.deleteRecurrence) {
             await this.recurrenceRepository.delete({ eventId });
@@ -271,16 +287,22 @@ export class EventService {
     }
 
     async editException(
+        userId: number,
         exceptionId: number,
         editExceptionDto: EditEventExceptionDTO,
     ) {
         const exceptionToUpdate = await this.exceptionRepository
-            .findOneByOrFail({
-                id: exceptionId,
+            .findOneOrFail({
+                where: { id: exceptionId },
+                relations: { mainEvent: true },
             })
             .catch(() => {
                 throw new NotFoundException('Exception not found');
             });
+
+        if (exceptionToUpdate.mainEvent.createdById !== userId)
+            throw new ForbiddenException('Forbidden');
+
         this.exceptionRepository.merge(exceptionToUpdate, editExceptionDto);
         return await this.exceptionRepository
             .update({ id: exceptionToUpdate.id }, { ...editExceptionDto })
@@ -295,11 +317,32 @@ export class EventService {
             });
     }
 
-    async delete(eventId: number) {
+    async delete(userId: number, eventId: number) {
+        const toDelete = await this.eventRepository
+            .findOneByOrFail({ id: eventId })
+            .catch(() => {
+                throw new NotFoundException('Event not found');
+            });
+
+        if (userId !== toDelete.createdById)
+            throw new ForbiddenException('Forbidden');
+
         await this.eventRepository.delete({ id: eventId });
     }
 
-    async deleteException(exceptionId: number) {
+    async deleteException(userId: number, exceptionId: number) {
+        const toDelete = await this.exceptionRepository
+            .findOneOrFail({
+                where: { id: exceptionId },
+                relations: { mainEvent: true },
+            })
+            .catch(() => {
+                throw new NotFoundException('Exception not found');
+            });
+
+        if (toDelete.mainEvent.createdById !== userId)
+            throw new ForbiddenException('Forbidden');
+
         await this.exceptionRepository.delete({ id: exceptionId });
     }
 }
