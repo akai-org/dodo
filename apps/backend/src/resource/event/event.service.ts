@@ -282,10 +282,7 @@ export class EventService {
         editExceptionDto: EditEventExceptionDTO,
     ) {
         const exceptionToUpdate = await this.exceptionRepository
-            .findOneOrFail({
-                where: { id: exceptionId },
-                relations: { mainEvent: true },
-            })
+            .findOneByOrFail({ id: exceptionId })
             .then(async (exception) => {
                 await this.eventRepository.findOneByOrFail({
                     id: exception.mainEventId,
