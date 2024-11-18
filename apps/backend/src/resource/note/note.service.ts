@@ -1,8 +1,10 @@
 import {
     BadRequestException,
+    ForbiddenException,
     HttpException,
     HttpStatus,
     Injectable,
+    NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -34,9 +36,18 @@ export class NoteService {
         return plainToInstance(NoteDTO, this.noteRepository.save(newNote));
     }
 
-    async edit(id: number, noteDto: editNoteDTO) {
+    async edit(userId: number, noteId: number, noteDto: editNoteDTO) {
+        const noteToUpdate = await this.noteRepository
+            .findOneOrFail({ where: { id: noteId }, relations: { user: true } })
+            .catch(() => {
+                throw new NotFoundException("Event doesn't exist");
+            });
+
+        if (noteToUpdate.user.id !== userId)
+            throw new ForbiddenException('Forbidden');
+
         await this.noteRepository
-            .update({ id }, { ...noteDto })
+            .update({ id: noteId }, { ...noteDto })
             .catch((error) => {
                 if (error instanceof UpdateValuesMissingError)
                     throw new BadRequestException('Invalid body');

@@ -1405,6 +1405,24 @@ describe('App e2e test', () => {
                 await pactum.spec().patch('/notes/1').expectStatus(401);
             });
 
+            it('Should fail if incorrect user', async () => {
+                await pactum
+                    .spec()
+                    .patch('/notes/1')
+                    .withBearerToken('$S{userToken}')
+                    .withBody(dto)
+                    .expectStatus(403);
+            });
+
+            it('Should fail if note not found', async () => {
+                await pactum
+                    .spec()
+                    .patch('/notes/999')
+                    .withBearerToken('$S{adminToken}')
+                    .withBody(dto)
+                    .expectStatus(404);
+            });
+
             it('Should fail if no body', async () => {
                 await pactum
                     .spec()

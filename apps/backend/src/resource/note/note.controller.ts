@@ -40,7 +40,11 @@ export class NoteController {
 
     @Patch(':id')
     @EditNoteApi()
-    async editNote(@Param('id') id: number, @Body() noteDto: editNoteDTO) {
-        return await this.notesService.edit(id, noteDto);
+    async editNote(
+        @GetUser('id') userId: number,
+        @Param('id') noteId: number,
+        @Body() noteDto: editNoteDTO,
+    ) {
+        return await this.notesService.edit(userId, noteId, noteDto);
     }
 }
