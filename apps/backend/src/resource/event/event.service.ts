@@ -236,18 +236,19 @@ export class EventService {
         eventId: number,
         exceptionDto: CreateEventExceptionDTO,
     ) {
-        await this.eventRepository
+        return await this.eventRepository
             .findOneByOrFail({ id: eventId, createdById: userId })
+            .then(async () => {
+                const exception = this.exceptionRepository.create({
+                    ...exceptionDto,
+                    mainEventId: eventId,
+                });
+                await this.exceptionRepository.insert(exception);
+                return plainToInstance(ReturnEventExceptionDTO, exception);
+            })
             .catch(() => {
                 throw new NotFoundException('Event not found');
             });
-
-        const exception = this.exceptionRepository.create({
-            ...exceptionDto,
-            mainEventId: eventId,
-        });
-        await this.exceptionRepository.insert(exception);
-        return plainToInstance(ReturnEventExceptionDTO, exception);
     }
 
     async edit(userId: number, eventId: number, editEventDto: EditEventDTO) {
@@ -284,12 +285,15 @@ export class EventService {
                 where: { id: exceptionId },
                 relations: { mainEvent: true },
             })
+            .then(async (exception) => {
+                await this.eventRepository.findOneByOrFail({
+                    createdById: userId,
+                });
+                return exception;
+            })
             .catch(() => {
                 throw new NotFoundException('Exception not found');
             });
-
-        if (exceptionToUpdate.mainEvent.createdById !== userId)
-            throw new NotFoundException('Exception not found');
 
         this.exceptionRepository.merge(exceptionToUpdate, editExceptionDto);
         return await this.exceptionRepository
