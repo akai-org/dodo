@@ -3,7 +3,6 @@ import {
     ApiBadRequestResponse,
     ApiBody,
     ApiCreatedResponse,
-    ApiForbiddenResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiUnauthorizedResponse,
@@ -32,7 +31,6 @@ export function EditNoteApi() {
         ApiOkResponse(),
         ApiBadRequestResponse({ description: 'Invalid body' }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
-        ApiForbiddenResponse({ description: 'Forbidden' }),
         ApiNotFoundResponse({ description: 'Note not found' }),
         ApiBody({ type: editNoteDTO }),
     );

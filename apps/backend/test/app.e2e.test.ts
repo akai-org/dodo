@@ -428,7 +428,7 @@ describe('App e2e test', () => {
                     .spec()
                     .get('/events/1')
                     .withBearerToken('$S{userToken}')
-                    .expectStatus(403);
+                    .expectStatus(404);
             });
 
             it('Should fail if event not found', async () => {
@@ -479,7 +479,7 @@ describe('App e2e test', () => {
                     .patch('/events/1')
                     .withBearerToken('$S{userToken}')
                     .withBody(dto)
-                    .expectStatus(403);
+                    .expectStatus(404);
             });
 
             it("Should fail if event doesn't exist", async () => {
@@ -532,7 +532,7 @@ describe('App e2e test', () => {
                     .spec()
                     .delete('/events/1')
                     .withBearerToken('$S{userToken}')
-                    .expectStatus(403);
+                    .expectStatus(404);
             });
 
             it("Should fail if event doesn't exist", async () => {
@@ -971,7 +971,7 @@ describe('App e2e test', () => {
                     .post('/events/exceptions/$S{event6Id}')
                     .withBody(dto)
                     .withBearerToken('$S{userToken}')
-                    .expectStatus(403);
+                    .expectStatus(404);
             });
 
             it("Should fail if event/exception don't exist", async () => {
@@ -1145,7 +1145,7 @@ describe('App e2e test', () => {
                     .spec()
                     .get('/events/exceptions/$S{event6ExceptionId}')
                     .withBearerToken('$S{userToken}')
-                    .expectStatus(403);
+                    .expectStatus(404);
             });
 
             it('Should return correct event exception', async () => {
@@ -1205,7 +1205,7 @@ describe('App e2e test', () => {
                     .patch('/events/exceptions/$S{event6ExceptionId}')
                     .withBody(dto)
                     .withBearerToken('$S{userToken}')
-                    .expectStatus(403);
+                    .expectStatus(404);
             });
 
             it("Should fail if event doesn't exist", async () => {
@@ -1274,7 +1274,7 @@ describe('App e2e test', () => {
                     .spec()
                     .delete('/events/exceptions/$S{event6ExceptionId}')
                     .withBearerToken('$S{userToken}')
-                    .expectStatus(403);
+                    .expectStatus(404);
             });
 
             it("Should fail if event doesn't exist", async () => {
@@ -1411,7 +1411,7 @@ describe('App e2e test', () => {
                     .patch('/notes/1')
                     .withBearerToken('$S{userToken}')
                     .withBody(dto)
-                    .expectStatus(403);
+                    .expectStatus(404);
             });
 
             it('Should fail if note not found', async () => {

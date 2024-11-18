@@ -1,6 +1,5 @@
 import {
     BadRequestException,
-    ForbiddenException,
     HttpException,
     HttpStatus,
     Injectable,
@@ -44,7 +43,7 @@ export class NoteService {
             });
 
         if (noteToUpdate.user.id !== userId)
-            throw new ForbiddenException('Forbidden');
+            throw new NotFoundException("Event doesn't exist");
 
         await this.noteRepository
             .update({ id: noteId }, { ...noteDto })
