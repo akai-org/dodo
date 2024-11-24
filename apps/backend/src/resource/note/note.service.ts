@@ -36,14 +36,14 @@ export class NoteService {
     }
 
     async edit(userId: number, noteId: number, noteDto: editNoteDTO) {
-        const noteToUpdate = await this.noteRepository
-            .findOneOrFail({ where: { id: noteId }, relations: { user: true } })
+        await this.noteRepository
+            .findOneOrFail({
+                where: { id: noteId, user: { id: userId } },
+                relations: { user: true },
+            })
             .catch(() => {
                 throw new NotFoundException("Event doesn't exist");
             });
-
-        if (noteToUpdate.user.id !== userId)
-            throw new NotFoundException("Event doesn't exist");
 
         await this.noteRepository
             .update({ id: noteId }, { ...noteDto })

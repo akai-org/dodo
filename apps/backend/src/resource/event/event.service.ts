@@ -205,14 +205,13 @@ export class EventService {
 
     async fetchExceptionById(userId: number, exceptionId: number) {
         return await this.exceptionRepository
-            .findOneByOrFail({ id: exceptionId })
-            .then(async (exception) => {
-                await this.eventRepository.findOneByOrFail({
-                    id: exception.mainEventId,
-                    createdById: userId,
-                });
-                return plainToInstance(ReturnEventExceptionDTO, exception);
+            .findOneOrFail({
+                where: { id: exceptionId, mainEvent: { createdById: userId } },
+                relations: { mainEvent: true },
             })
+            .then(async (exception) =>
+                plainToInstance(ReturnEventExceptionDTO, exception),
+            )
             .catch(() => {
                 throw new NotFoundException('Exception not found');
             });
@@ -237,19 +236,18 @@ export class EventService {
         eventId: number,
         exceptionDto: CreateEventExceptionDTO,
     ) {
-        return await this.eventRepository
+        await this.eventRepository
             .findOneByOrFail({ id: eventId, createdById: userId })
-            .then(async () => {
-                const exception = this.exceptionRepository.create({
-                    ...exceptionDto,
-                    mainEventId: eventId,
-                });
-                await this.exceptionRepository.insert(exception);
-                return plainToInstance(ReturnEventExceptionDTO, exception);
-            })
             .catch(() => {
                 throw new NotFoundException('Event not found');
             });
+
+        const exception = this.exceptionRepository.create({
+            ...exceptionDto,
+            mainEventId: eventId,
+        });
+        await this.exceptionRepository.insert(exception);
+        return plainToInstance(ReturnEventExceptionDTO, exception);
     }
 
     async edit(userId: number, eventId: number, editEventDto: EditEventDTO) {
@@ -282,13 +280,9 @@ export class EventService {
         editExceptionDto: EditEventExceptionDTO,
     ) {
         const exceptionToUpdate = await this.exceptionRepository
-            .findOneByOrFail({ id: exceptionId })
-            .then(async (exception) => {
-                await this.eventRepository.findOneByOrFail({
-                    id: exception.mainEventId,
-                    createdById: userId,
-                });
-                return exception;
+            .findOneOrFail({
+                where: { id: exceptionId, mainEvent: { createdById: userId } },
+                relations: { mainEvent: true },
             })
             .catch(() => {
                 throw new NotFoundException('Exception not found');
@@ -309,30 +303,25 @@ export class EventService {
     }
 
     async delete(userId: number, eventId: number) {
-        return await this.eventRepository
+        await this.eventRepository
             .findOneByOrFail({ id: eventId, createdById: userId })
-            .then(async () => {
-                await this.eventRepository.delete({ id: eventId });
-            })
             .catch(() => {
                 throw new NotFoundException('Event not found');
             });
+
+        await this.eventRepository.delete({ id: eventId });
     }
 
     async deleteException(userId: number, exceptionId: number) {
-        return await this.exceptionRepository
+        await this.exceptionRepository
             .findOneOrFail({
-                where: { id: exceptionId },
-            })
-            .then(async (exception) => {
-                await this.eventRepository.findOneByOrFail({
-                    id: exception.mainEventId,
-                    createdById: userId,
-                });
-                await this.exceptionRepository.delete({ id: exceptionId });
+                where: { id: exceptionId, mainEvent: { createdById: userId } },
+                relations: { mainEvent: true },
             })
             .catch(() => {
                 throw new NotFoundException('Exception not found');
             });
+
+        await this.exceptionRepository.delete({ id: exceptionId });
     }
 }
