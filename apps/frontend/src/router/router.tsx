@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
     },
     {
         path: Route.TODOLIST,
-        element: <ToDoList />,
+        element: withGuard(<ToDoList />),
     },
     {
         path: Route.NOTES,

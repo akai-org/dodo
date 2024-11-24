@@ -8,7 +8,7 @@ const initialValues: ThemeState = {
     }
 }
 
-const useThemeStore = create<ThemeStore>()((set) =>( {
+const useThemeStore = create<ThemeStore>((set) =>( {
     ...initialValues,
     setTheme(theme) { set(() => ({theme})) }
 }))
