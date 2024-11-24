@@ -36,22 +36,24 @@ export class NoteService {
     }
 
     async edit(userId: number, noteId: number, noteDto: editNoteDTO) {
-        await this.noteRepository
-            .findOneOrFail({
-                where: { id: noteId, user: { id: userId } },
-                relations: { user: true },
-            })
-            .catch(() => {
-                throw new NotFoundException("Event doesn't exist");
-            });
+        await this.noteRepository.manager.transaction(async (transaction) => {
+            await transaction
+                .findOneOrFail(NoteEntity, {
+                    where: { id: noteId, user: { id: userId } },
+                    relations: { user: true },
+                })
+                .catch(() => {
+                    throw new NotFoundException("Event doesn't exist");
+                });
 
-        await this.noteRepository
-            .update({ id: noteId }, { ...noteDto })
-            .catch((error) => {
-                if (error instanceof UpdateValuesMissingError)
-                    throw new BadRequestException('Invalid body');
+            await transaction
+                .update(NoteEntity, { id: noteId }, { ...noteDto })
+                .catch((error) => {
+                    if (error instanceof UpdateValuesMissingError)
+                        throw new BadRequestException('Invalid body');
 
-                throw error;
-            });
+                    throw error;
+                });
+        });
     }
 }

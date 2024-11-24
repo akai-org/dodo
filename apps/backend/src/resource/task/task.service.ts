@@ -44,19 +44,26 @@ export class TaskService {
     }
 
     async edit(user: UserEntity, editTask: EditTaskDTO) {
-        await this.taskRepository
-            .findOneByOrFail({
-                id: editTask.id,
-                user,
-            })
-            .catch(() => {
-                throw new NotFoundException('Task not found');
-            });
+        return await this.taskRepository.manager.transaction(
+            async (transaction) => {
+                await transaction
+                    .findOneByOrFail(TaskEntity, {
+                        id: editTask.id,
+                        user,
+                    })
+                    .catch(() => {
+                        throw new NotFoundException('Task not found');
+                    });
 
-        const editedTask: TaskEntity = await this.taskRepository.save({
-            ...editTask,
-        });
-        return plainToInstance(ReturnTaskDTO, editedTask);
+                const editedTask: TaskEntity = await transaction.save(
+                    TaskEntity,
+                    {
+                        ...editTask,
+                    },
+                );
+                return plainToInstance(ReturnTaskDTO, editedTask);
+            },
+        );
     }
 
     async delete(user: UserEntity, id: number) {
