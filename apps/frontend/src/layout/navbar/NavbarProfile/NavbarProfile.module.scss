@@ -1,0 +1,129 @@
+.userContainer {
+    transition: 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.userInfoContainer {
+    transition: 0.2s;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.userTextContainer {
+    transition: 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.userLogo {
+    display: flex;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    z-index: 2;
+    margin-left: -20px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: var(--darkgray-color);
+    font-size: 30px;
+    border: solid 2px hsl(0, 0%, 26%);
+    color: #fff;
+}
+
+.userName {
+    transition: 0.2s;
+    font-size: 1.3rem;
+    color: #fff;
+    margin-top: -25px;
+    margin-left: 40px;
+}
+
+.userLogout {
+    align-self: flex-start;
+    padding-top: 0.3rem;
+    margin-left: 40px;
+    color: hsl(0, 0%, 45%);
+    font-weight: 500;
+}
+
+.logoutBackground {
+    transition: 0.2s;
+    width: 170px;
+    height: 25px;
+    position: absolute;
+    border-radius: 7px;
+    background-color: var(--lightgray-color);
+    cursor: pointer;
+}
+
+.line {
+    transition: 0.2s;
+    position: absolute;
+    width: 180px;
+    height: 1px;
+    left: 25px;
+    background-color: white;
+    top: 90%;
+}
+
+.logoutBackgroundSnippet {
+    transition: 0.2s;
+    width: 180px;
+    height: 25px;
+    margin-left: 30px;
+    margin-bottom: 30px;
+    border-radius: 7px;
+    background-color: var(--darkgray-color);
+}
+
+.short {
+    &.logoutBackgroundSnippet {
+        width: 0;
+    }
+
+    &.logoutBackground {
+        width: 0;
+    }
+
+    &.userLogout {
+        display: none;
+    }
+
+    &.line {
+        width: 0;
+    }
+
+    &.userTextContainer {
+        display: none;
+    }
+}
+
+.mobile {
+    &.userContainer {
+        width: 100%;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &.logoutBackgroundSnippet {
+        margin-left: 0px;
+        margin-bottom: 0px;
+    }
+
+    &.line {
+        display: none;
+    }
+}
+
+// Hiding user info if height too little
+@media screen and (max-height: 666px) {
+    .userContainer {
+        display: none;
+    }
+}

@@ -1,7 +1,7 @@
 import { FC, ReactElement, useEffect } from 'react';
-import {Navigate, useLocation} from 'react-router';
-import {Route} from "../router/router.types.ts";
-import {verifyToken} from "./auth.utils.ts";
+import { Navigate, useLocation } from 'react-router';
+import { Route } from '../router/router.types.ts';
+import { verifyToken } from './auth.utils.ts';
 import useLocationStore from '../store/location/location.store.ts';
 
 interface GuardProps {
@@ -13,7 +13,7 @@ const Guard: FC<GuardProps> = ({ children }): ReactElement => {
     const location = useLocation();
     const isLogin = location.pathname === Route.LOGIN;
 
-    const isTokenValid = verifyToken();
+    const isTokenValid = verifyToken(); // = true
 
     useEffect(() => {
         setLocationPath(location.pathname);
@@ -30,4 +30,6 @@ const Guard: FC<GuardProps> = ({ children }): ReactElement => {
     return children;
 };
 
-export const withGuard = (component: ReactElement): ReactElement => <Guard>{component}</Guard>;
+export const withGuard = (component: ReactElement): ReactElement => (
+    <Guard>{component}</Guard>
+);

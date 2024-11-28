@@ -1,29 +1,25 @@
-import {
-    useState, useLayoutEffect, useEffect, ReactElement
-} from 'react';
+import { useState, useLayoutEffect, useEffect, ReactElement } from 'react';
 
 import styles from './Navbar.module.scss';
 
 import { NavbarItems } from './NavbarItems.tsx';
-import {NavbarModuleParent} from "./navbarmodule/NavbarModule.tsx";
-import { RiMenuFill } from "react-icons/ri";
-import { RiCloseFill } from "react-icons/ri";
-import { RiCheckboxBlankCircleLine } from "react-icons/ri";
-import {Route} from "../../router/router.types.ts";
-import useAuthApi from '../../api/useAuthApi.tsx';
-
-
+import { NavbarModuleParent } from './navbarmodule/NavbarModule.tsx';
+import { RiMenuFill } from 'react-icons/ri';
+import { RiCloseFill } from 'react-icons/ri';
+import { RiCheckboxBlankCircleLine } from 'react-icons/ri';
+import { Route } from '../../router/router.types.ts';
+import NavbarProfile from './NavbarProfile/NavbarProfile.tsx';
 
 // CONSTANTS
 const FULL_MENU_BREAKPOINT = 1024;
 const SHORT_MENU_BREAKPOINT = 768;
 
 const COLLAPSE_ICON = <RiCloseFill />;
-const EXPAND_ICON = <RiMenuFill/>;
+const EXPAND_ICON = <RiMenuFill />;
 
-interface Mode {
+export interface Mode {
     class: string;
-    number: number,
+    number: number;
     icon: ReactElement;
 }
 
@@ -52,8 +48,6 @@ const initializeMenu = (): Mode => {
 
 const Navbar = () => {
     const location = window.location;
-    const { useCurrentUser } = useAuthApi();
-    const { data: user } = useCurrentUser();
 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [mode, setMode] = useState<Mode>(initializeMenu());
@@ -92,7 +86,6 @@ const Navbar = () => {
     }, [windowWidth]);
 
     useEffect(() => {
-
         const handleResize = () => {
             if (window.innerWidth !== windowWidth)
                 setWindowWidth(window.innerWidth);
@@ -104,7 +97,6 @@ const Navbar = () => {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
-
     return (
         <>
             <div className={`${styles.top}  ${styles[mode.class]}`}>
@@ -136,7 +128,7 @@ const Navbar = () => {
                         {mode.icon}
                     </div>
                 </div>
-                <NavbarModuleParent modeClass={mode.class}/>
+                <NavbarModuleParent modeClass={mode.class} />
             </div>
 
             <nav className={`${styles.side} ${mode.class}`}>
@@ -191,23 +183,7 @@ const Navbar = () => {
                         })}
                     </ul>
                 </div>
-
-                <div className={`${styles.userContainer} ${mode.class}`}>
-                    <div className={`${styles.logoutBackgroundSnippet} ${mode.class}`}>
-                        <div className={`${styles.logoutBackground} ${mode.class}`}>
-                            <div className={`${styles.userInfoContainer} ${mode.class}`}>
-                                <div className={`${styles.userLogo} ${mode.class}`}>AV</div>
-                                <div className={`${styles.userTextContainer} ${mode.class}`} >
-                                    <div className={`${styles.line} ${mode.class}`}></div>
-                                    <div className={`${styles.userName} ${mode.class}`}>
-                                        {user?.username ?? ''}
-                                    </div>
-                                    <div className={`${styles.userLogout} ${mode.class}`} >PROFILE</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <NavbarProfile mode={mode} />
             </nav>
         </>
     );
