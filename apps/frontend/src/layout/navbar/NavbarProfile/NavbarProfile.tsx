@@ -12,7 +12,7 @@ interface NavbarProfileProps {
 
 const NavbarProfile: FC<NavbarProfileProps> = ({ mode }): ReactElement => {
     const { useCurrentUser } = useAuthApi();
-    const { data: user } = useCurrentUser(); // user = { username: 'Admin' };
+    const { data: user } = useCurrentUser();
     const [profileMode, setProfileMode] = useState({
         class: '',
     });
@@ -31,7 +31,6 @@ const NavbarProfile: FC<NavbarProfileProps> = ({ mode }): ReactElement => {
                 setProfileMode({ class: '' });
                 break;
         }
-        localStorage.setItem('access_token', 'dfsiogjrigjeri');
     }, [mode]);
     return (
         <div className={`${styles.userContainer} ${profileMode.class}`}>

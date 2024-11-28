@@ -13,7 +13,7 @@ const Guard: FC<GuardProps> = ({ children }): ReactElement => {
     const location = useLocation();
     const isLogin = location.pathname === Route.LOGIN;
 
-    const isTokenValid = verifyToken(); // = true
+    const isTokenValid = verifyToken();
 
     useEffect(() => {
         setLocationPath(location.pathname);
