@@ -95,6 +95,7 @@ export function DeleteEventApi() {
     return applyDecorators(
         ApiNoContentResponse(),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiNotFoundResponse({ description: 'Event not found' }),
     );
 }
 
@@ -102,5 +103,6 @@ export function DeleteExceptionApi() {
     return applyDecorators(
         ApiNoContentResponse(),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiNotFoundResponse({ description: 'Exception not found' }),
     );
 }

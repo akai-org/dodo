@@ -3,6 +3,7 @@ import {
     HttpException,
     HttpStatus,
     Injectable,
+    NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -34,14 +35,25 @@ export class NoteService {
         return plainToInstance(NoteDTO, this.noteRepository.save(newNote));
     }
 
-    async edit(id: number, noteDto: editNoteDTO) {
-        await this.noteRepository
-            .update({ id }, { ...noteDto })
-            .catch((error) => {
-                if (error instanceof UpdateValuesMissingError)
-                    throw new BadRequestException('Invalid body');
+    async edit(userId: number, noteId: number, noteDto: editNoteDTO) {
+        await this.noteRepository.manager.transaction(async (transaction) => {
+            await transaction
+                .findOneOrFail(NoteEntity, {
+                    where: { id: noteId, user: { id: userId } },
+                    relations: { user: true },
+                })
+                .catch(() => {
+                    throw new NotFoundException("Event doesn't exist");
+                });
 
-                throw error;
-            });
+            await transaction
+                .update(NoteEntity, { id: noteId }, { ...noteDto })
+                .catch((error) => {
+                    if (error instanceof UpdateValuesMissingError)
+                        throw new BadRequestException('Invalid body');
+
+                    throw error;
+                });
+        });
     }
 }

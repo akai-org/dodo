@@ -39,10 +39,10 @@ export class EventService {
         private readonly exceptionRepository: Repository<EventExceptionEntity>,
     ) {}
 
-    async fetchById(eventId: number) {
+    async fetchById(userId: number, eventId: number) {
         return await this.eventRepository
             .findOneOrFail({
-                where: { id: eventId },
+                where: { id: eventId, createdById: userId },
                 relations: { recurrencePattern: true },
             })
             .then((event) => plainToInstance(ReturnEventDTO, event))
@@ -203,10 +203,11 @@ export class EventService {
         return plainToInstance(ReturnEventWithDatesDTO, filtered);
     }
 
-    async fetchExceptionById(exceptionId: number) {
+    async fetchExceptionById(userId: number, exceptionId: number) {
         return await this.exceptionRepository
-            .findOneByOrFail({
-                id: exceptionId,
+            .findOneOrFail({
+                where: { id: exceptionId, mainEvent: { createdById: userId } },
+                relations: { mainEvent: true },
             })
             .then((exception) =>
                 plainToInstance(ReturnEventExceptionDTO, exception),
@@ -230,76 +231,144 @@ export class EventService {
         return plainToInstance(ReturnEventDTO, event);
     }
 
-    async addException(eventId: number, exceptionDto: CreateEventExceptionDTO) {
-        return await this.eventRepository
-            .findOneByOrFail({ id: eventId })
-            .then(async () => {
-                const exception = this.exceptionRepository.create({
+    async addException(
+        userId: number,
+        eventId: number,
+        exceptionDto: CreateEventExceptionDTO,
+    ) {
+        return await this.eventRepository.manager.transaction(
+            async (transaction) => {
+                await transaction
+                    .findOneByOrFail(EventEntity, {
+                        id: eventId,
+                        createdById: userId,
+                    })
+                    .catch(() => {
+                        throw new NotFoundException('Event not found');
+                    });
+
+                const exception = transaction.create(EventExceptionEntity, {
                     ...exceptionDto,
                     mainEventId: eventId,
                 });
-                await this.exceptionRepository.insert(exception);
+                await transaction.insert(EventExceptionEntity, exception);
                 return plainToInstance(ReturnEventExceptionDTO, exception);
-            })
-            .catch(() => {
-                throw new NotFoundException('Event not found');
-            });
+            },
+        );
     }
 
-    async edit(eventId: number, editEventDto: EditEventDTO) {
-        const eventToUpdate = await this.eventRepository
-            .findOneOrFail({
-                where: { id: eventId },
-            })
-            .catch(() => {
-                throw new NotFoundException('Event not found');
-            });
+    async edit(userId: number, eventId: number, editEventDto: EditEventDTO) {
+        return await this.eventRepository.manager.transaction(
+            async (transaction) => {
+                const eventToUpdate = await transaction
+                    .findOneOrFail(EventEntity, {
+                        where: { id: eventId, createdById: userId },
+                    })
+                    .catch(() => {
+                        throw new NotFoundException('Event not found');
+                    });
 
-        if (editEventDto.deleteRecurrence) {
-            await this.recurrenceRepository.delete({ eventId });
-            delete editEventDto.recurrencePattern;
-        }
-        delete editEventDto.deleteRecurrence;
+                if (editEventDto.deleteRecurrence) {
+                    await transaction.delete(RecurrenceEntity, { eventId });
+                    delete editEventDto.recurrencePattern;
+                }
+                delete editEventDto.deleteRecurrence;
 
-        if (editEventDto.recurrencePattern)
-            editEventDto.recurrencePattern.eventId = eventId;
+                if (editEventDto.recurrencePattern)
+                    editEventDto.recurrencePattern.eventId = eventId;
 
-        this.eventRepository.merge(eventToUpdate, editEventDto);
-        await this.eventRepository.save(eventToUpdate);
+                transaction.merge(EventEntity, eventToUpdate, editEventDto);
+                await transaction.save(EventEntity, eventToUpdate);
 
-        return plainToInstance(ReturnEventDTO, eventToUpdate);
+                return plainToInstance(ReturnEventDTO, eventToUpdate);
+            },
+        );
     }
 
     async editException(
+        userId: number,
         exceptionId: number,
         editExceptionDto: EditEventExceptionDTO,
     ) {
-        const exceptionToUpdate = await this.exceptionRepository
-            .findOneByOrFail({
-                id: exceptionId,
-            })
-            .catch(() => {
-                throw new NotFoundException('Exception not found');
-            });
-        this.exceptionRepository.merge(exceptionToUpdate, editExceptionDto);
-        return await this.exceptionRepository
-            .update({ id: exceptionToUpdate.id }, { ...editExceptionDto })
-            .then(() =>
-                plainToInstance(ReturnEventExceptionDTO, exceptionToUpdate),
-            )
-            .catch((error) => {
-                if (error instanceof UpdateValuesMissingError) {
-                    throw new BadRequestException('Invalid body');
-                }
-                throw error;
-            });
+        return await this.eventRepository.manager.transaction(
+            async (transaction) => {
+                const exceptionToUpdate = await transaction
+                    .findOneOrFail(EventExceptionEntity, {
+                        where: {
+                            id: exceptionId,
+                            mainEvent: { createdById: userId },
+                        },
+                        relations: { mainEvent: true },
+                    })
+                    .catch(() => {
+                        throw new NotFoundException('Exception not found');
+                    });
+
+                transaction.merge(
+                    EventExceptionEntity,
+                    exceptionToUpdate,
+                    editExceptionDto,
+                );
+                return await transaction
+                    .update(
+                        EventExceptionEntity,
+                        { id: exceptionToUpdate.id },
+                        { ...editExceptionDto },
+                    )
+                    .then(() =>
+                        plainToInstance(
+                            ReturnEventExceptionDTO,
+                            exceptionToUpdate,
+                        ),
+                    )
+                    .catch((error) => {
+                        if (error instanceof UpdateValuesMissingError) {
+                            throw new BadRequestException('Invalid body');
+                        }
+                        throw error;
+                    });
+            },
+        );
     }
 
-    async delete(eventId: number) {
-        await this.eventRepository.delete({ id: eventId });
+    async delete(userId: number, eventId: number) {
+        await this.exceptionRepository.manager.transaction(
+            async (transaction) => {
+                await transaction
+                    .findOneByOrFail(EventEntity, {
+                        id: eventId,
+                        createdById: userId,
+                    })
+                    .catch(() => {
+                        throw new NotFoundException('Event not found');
+                    });
+
+                await transaction.delete(EventEntity, {
+                    id: eventId,
+                });
+            },
+        );
     }
 
-    async deleteException(exceptionId: number) {
-        await this.exceptionRepository.delete({ id: exceptionId });
+    async deleteException(userId: number, exceptionId: number) {
+        await this.exceptionRepository.manager.transaction(
+            async (transaction) => {
+                await transaction
+                    .findOneOrFail(EventExceptionEntity, {
+                        where: {
+                            id: exceptionId,
+                            mainEvent: { createdById: userId },
+                        },
+                        relations: { mainEvent: true },
+                    })
+                    .catch(() => {
+                        throw new NotFoundException('Exception not found');
+                    });
+
+                await transaction.delete(EventExceptionEntity, {
+                    id: exceptionId,
+                });
+            },
+        );
     }
 }

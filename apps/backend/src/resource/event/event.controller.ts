@@ -68,14 +68,20 @@ export class EventController {
 
     @Get(':id')
     @GetEventByIdApi()
-    async getEventById(@Param('id') eventId: number) {
-        return await this.eventService.fetchById(eventId);
+    async getEventById(
+        @GetUser('id') userId: number,
+        @Param('id') eventId: number,
+    ) {
+        return await this.eventService.fetchById(userId, eventId);
     }
 
     @Get('exceptions/:id')
     @GetEventExceptionByIdApi()
-    async getEventExceptionById(@Param('id') exceptionId: number) {
-        return await this.eventService.fetchExceptionById(exceptionId);
+    async getEventExceptionById(
+        @GetUser('id') userId: number,
+        @Param('id') exceptionId: number,
+    ) {
+        return await this.eventService.fetchExceptionById(userId, exceptionId);
     }
 
     @Post()
@@ -90,28 +96,36 @@ export class EventController {
     @Post('exceptions/:id')
     @AddEventExceptionApi()
     async addEventException(
+        @GetUser('id') userId: number,
         @Param('id') eventId: number,
         @Body() exceptionDto: CreateEventExceptionDTO,
     ) {
-        return await this.eventService.addException(eventId, exceptionDto);
+        return await this.eventService.addException(
+            userId,
+            eventId,
+            exceptionDto,
+        );
     }
 
     @Patch(':id')
     @EditEventApi()
     async editEvent(
+        @GetUser('id') userId: number,
         @Param('id') eventId: number,
         @Body() editEventDto: EditEventDTO,
     ) {
-        return await this.eventService.edit(eventId, editEventDto);
+        return await this.eventService.edit(userId, eventId, editEventDto);
     }
 
     @Patch('exceptions/:id')
     @EditExceptionApi()
     async editException(
+        @GetUser('id') userId: number,
         @Param('id') exceptionId: number,
         @Body() editExceptionDto: EditEventExceptionDTO,
     ) {
         return await this.eventService.editException(
+            userId,
             exceptionId,
             editExceptionDto,
         );
@@ -120,14 +134,20 @@ export class EventController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @Delete(':id')
     @DeleteEventApi()
-    async deleteEvent(@Param('id') eventId: number) {
-        await this.eventService.delete(eventId);
+    async deleteEvent(
+        @GetUser('id') userId: number,
+        @Param('id') eventId: number,
+    ) {
+        await this.eventService.delete(userId, eventId);
     }
 
     @HttpCode(HttpStatus.NO_CONTENT)
     @Delete('exceptions/:id')
     @DeleteExceptionApi()
-    async deleteException(@Param('id') exceptionId: number) {
-        await this.eventService.deleteException(exceptionId);
+    async deleteException(
+        @GetUser('id') userId: number,
+        @Param('id') exceptionId: number,
+    ) {
+        await this.eventService.deleteException(userId, exceptionId);
     }
 }

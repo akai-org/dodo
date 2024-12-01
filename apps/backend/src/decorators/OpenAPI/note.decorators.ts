@@ -31,6 +31,7 @@ export function EditNoteApi() {
         ApiOkResponse(),
         ApiBadRequestResponse({ description: 'Invalid body' }),
         ApiUnauthorizedResponse({ description: 'Unauthorized' }),
+        ApiNotFoundResponse({ description: 'Note not found' }),
         ApiBody({ type: editNoteDTO }),
     );
 }

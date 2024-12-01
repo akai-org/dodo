@@ -17,25 +17,27 @@ export class UserService {
     ) {}
 
     async editMe(userId: number, editUserDto: EditUserDTO) {
-        const userToUpdate = await this.userRepository
-            .findOneByOrFail({
-                id: userId,
-            })
-            .catch(() => {
-                throw new NotFoundException('User not found');
-            });
+        return this.userRepository.manager.transaction(async (transaction) => {
+            const userToUpdate = await transaction
+                .findOneByOrFail(UserEntity, {
+                    id: userId,
+                })
+                .catch(() => {
+                    throw new NotFoundException('User not found');
+                });
 
-        this.userRepository.merge(userToUpdate, editUserDto);
+            transaction.merge(UserEntity, userToUpdate, editUserDto);
 
-        return await this.userRepository
-            .update({ id: userId }, { ...editUserDto })
-            .then(() => plainToInstance(ReturnUserDTO, userToUpdate))
-            .catch((error) => {
-                if (error instanceof UpdateValuesMissingError) {
-                    throw new BadRequestException('Invalid body');
-                }
-                throw error;
-            });
+            return await transaction
+                .update(UserEntity, { id: userId }, { ...editUserDto })
+                .then(() => plainToInstance(ReturnUserDTO, userToUpdate))
+                .catch((error) => {
+                    if (error instanceof UpdateValuesMissingError) {
+                        throw new BadRequestException('Invalid body');
+                    }
+                    throw error;
+                });
+        });
     }
 
     async getUserById(userId: number) {
