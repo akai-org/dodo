@@ -1,0 +1,35 @@
+
+services:
+# -= Backend =-
+  mysql:
+    image: mysql:8.3.0
+    restart: always
+    profiles: [ db, backend ]
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    environment:
+      - MYSQL_HOST=${DB_HOSTNAME}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+
+  backend:
+    depends_on:
+      mysql:
+        condition: service_started
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    profiles: [ backend ]
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=${NODE_ENV}
+    volumes:
+      - ./tsconfig.json:/app/tsconfig.common.json
+
+  # --= Frontend =--
+  # TODO
