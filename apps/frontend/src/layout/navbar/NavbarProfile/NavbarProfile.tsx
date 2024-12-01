@@ -5,7 +5,6 @@ import styles from './NavbarProfile.module.scss';
 import { Mode } from '../Navbar';
 import useAuthApi from '../../../api/useAuthApi';
 import { removeAccessToken } from '../../../auth/auth.utils';
-
 interface NavbarProfileProps {
     mode: Mode;
 }
@@ -44,7 +43,7 @@ const NavbarProfile: FC<NavbarProfileProps> = ({ mode }): ReactElement => {
                         onClick={removeAccessToken}
                         className={`${styles.userLogout} ${profileMode.class}`}
                     >
-                        LOGOUT
+                        <a href="/login">LOGOUT</a>
                     </div>
                 </div>
                 <div
