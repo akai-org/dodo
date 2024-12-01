@@ -5,8 +5,25 @@ import styles from './NavbarProfile.module.scss';
 import { Mode } from '../Navbar';
 import useAuthApi from '../../../api/useAuthApi';
 import { removeAccessToken } from '../../../auth/auth.utils';
+
 interface NavbarProfileProps {
     mode: Mode;
+}
+function logOut() {
+    new Promise((resolve, reject) => {
+        try {
+            removeAccessToken();
+            resolve('Logged out');
+        } catch (e) {
+            reject(e);
+        }
+    })
+        .then(() => {
+            window.location.reload();
+        })
+        .catch((e) => {
+            throw new Error(e);
+        });
 }
 
 const NavbarProfile: FC<NavbarProfileProps> = ({ mode }): ReactElement => {
@@ -31,6 +48,7 @@ const NavbarProfile: FC<NavbarProfileProps> = ({ mode }): ReactElement => {
                 break;
         }
     }, [mode]);
+
     return (
         <div className={`${styles.userContainer} ${profileMode.class}`}>
             <div
@@ -40,10 +58,10 @@ const NavbarProfile: FC<NavbarProfileProps> = ({ mode }): ReactElement => {
                     className={`${styles.logoutBackground} ${profileMode.class}`}
                 >
                     <div
-                        onClick={removeAccessToken}
+                        onClick={logOut}
                         className={`${styles.userLogout} ${profileMode.class}`}
                     >
-                        <a href="/login">LOGOUT</a>
+                        LOGOUT
                     </div>
                 </div>
                 <div
