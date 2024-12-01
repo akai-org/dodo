@@ -1,4 +1,4 @@
-import {LoginForm, LoginValidationErrors} from "./auth.types.ts";
+import { LoginForm, LoginValidationErrors } from './auth.types.ts';
 import { jwtDecode } from 'jwt-decode';
 
 export const verifyToken = (): boolean => {
@@ -15,18 +15,18 @@ export const verifyToken = (): boolean => {
     } catch (e) {
         return false;
     }
-}
+};
 
 export const getAccessToken = () => {
     if (!(localStorage.getItem('access_token') == null)) {
         return localStorage.getItem('access_token');
     }
     return null;
-}
+};
 
 export const setAccessToken = (token: string) => {
     localStorage.setItem('access_token', token);
-}
+};
 
 export const removeAccessToken = () => {
     try {
@@ -34,7 +34,7 @@ export const removeAccessToken = () => {
     } catch {
         return;
     }
-}
+};
 
 export const loginFormValidator = (form: LoginForm) => {
     const errors: LoginValidationErrors = {};

@@ -101,20 +101,7 @@
     }
 
     &.menuItemActive,
-    &.menuLinkTag{
-        display: none;
-    }
-    &.logoutBackgroundSnippet{
-        // display: none;
-        width: 0;
-    }
-    &.logoutBackground{
-        width: 0;
-    }
-    &.line{
-        width: 0;
-    }
-    &.userTextContainer{
+    &.menuLinkTag {
         display: none;
     }
 }
@@ -158,16 +145,7 @@
         display: none;
     }
 
-    &.userContainer{
-        width: 100%;
-        height: 100%;
-        justify-content: center;
-        align-items: center;
-    }
-    &.logoutBackgroundSnippet{
-        margin-left: 0px;
-        margin-bottom: 0px;
-    }
+
 }
 
 // HIDE MENU
@@ -249,7 +227,6 @@
     border-bottom-right-radius: 10px;
     border-top-right-radius: 10px;
     background-color: var(--third-color);
-
     transition: 0.2s;
 }
 
@@ -294,7 +271,8 @@
     .menuLinkIcon {
         font-size: 31px;
         transition: 0.2s;
-        > svg{
+
+        >svg {
             position: absolute;
             align-self: center;
             justify-self: center;
@@ -318,7 +296,7 @@
     font-size: 30px;
     justify-content: center;
 
-    > svg{
+    >svg {
         position: absolute;
         align-self: center;
         justify-self: center;
@@ -345,94 +323,4 @@
     margin-left: 15px;
     text-wrap: nowrap;
     font-size: 20px;
-}
-
-// DOWN USER INFO
-.userContainer {
-    transition: 0.2s;
-    display: flex;
-    flex-direction: column;
-}
-
-.userInfoContainer {
-    transition: 0.2s;
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.userTextContainer {
-    transition: 0.2s;
-    display: flex;
-    flex-direction: column;
-}
-
-.userLogo {
-    display: flex;
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    margin-top: -22px;
-    margin-left: -20px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background-color: var(--darkgray-color);
-    font-size: 30px;
-    border: solid 2px hsl(0, 0%, 26%);
-    color: var(--basebg-color);
-}
-
-.userName {
-    transition: 0.2s;
-    font-size: 1.3rem;
-    color: var(--basebg-color);
-    margin-top: -25px;
-    margin-left: 40px;
-}
-
-.userLogout {
-    align-self: flex-start;
-    padding-top: 0.3rem;
-    margin-left: 40px;
-    color: hsl(0, 0%, 45%);
-    font-weight: 500;
-}
-
-.logoutBackground {
-    transition: 0.2s;
-    width: 170px;
-    height: 25px;
-    position: absolute;
-    border-radius: 7px;
-    background-color: var(--lightgray-color);
-}
-
-.line {
-    transition: 0.2s;
-    position: absolute;
-    width: 180px;
-    height: 1px;
-    left: 0px;
-    background-color: white;
-    top: -40px;
-}
-
-.logoutBackgroundSnippet {
-    transition: 0.2s;
-    width: 180px;
-    height: 25px;
-    margin-left: 30px;
-    margin-bottom: 30px;
-    border-radius: 7px;
-    background-color: var(--darkgray-color);
-}
-
-// Hiding user info if height too little
-@media screen and (max-height: 666px) {
-    .userContainer {
-        display: none;
-    }
 }
