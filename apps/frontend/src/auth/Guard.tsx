@@ -12,6 +12,7 @@ const Guard: FC<GuardProps> = ({ children }): ReactElement => {
     const { setLocationPath } = useLocationStore();
     const location = useLocation();
     const isLogin = location.pathname === Route.LOGIN;
+    const isRegister = location.pathname === Route.REGISTER;
 
     const isTokenValid = verifyToken();
 
@@ -23,7 +24,7 @@ const Guard: FC<GuardProps> = ({ children }): ReactElement => {
         return <Navigate to={Route.HOME} state={{ from: location }} replace />;
     }
 
-    if (!isTokenValid && !isLogin) {
+    if (!isTokenValid && !isLogin && !isRegister) {
         return <Navigate to={Route.LOGIN} state={{ from: location }} replace />;
     }
 

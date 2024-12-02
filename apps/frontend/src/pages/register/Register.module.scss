@@ -1,0 +1,192 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.registerContainer {
+  position: relative;
+  display: flex;
+  background-color: #424242;
+  color: #fff;
+  width: 50vw;
+  height: 25.5vw;
+  border-radius: 0.83vw;
+  z-index: 2;
+  align-items: center;
+  justify-content: center;
+}
+
+.topMobile {
+  display: none;
+}
+
+.dodoLogo {
+  width: 3.5vw;
+}
+
+.dodoName {
+  color: #828282;
+}
+
+.registerForm {
+  width: 38%;
+  padding: 3.33vw 2.5vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.registerForm input {
+  background-color: #fff;
+  border: none;
+  padding: 0.83vw;
+  margin: 0.42vw 0;
+  font-size: 0.93vw;
+  font-family: inherit;
+  border-radius: 0.83vw;
+  width: 90%;
+  height: 0.83vw;
+}
+
+::placeholder {
+  color: #424242;
+}
+
+.registerButton {
+  width: 50%;
+  margin-top: 0.475vw;
+  padding: 0.42vw;
+  background-color: #828282;
+  color: white;
+  font-size: 1.04vw;
+  border: none;
+  border-radius: 0.58vw;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.registerButton:hover {
+  background-color: #a8a8a8;
+  transition: 0.25s;
+}
+
+.bottomBlock {
+  position: absolute;
+  width: 100%;
+  height: 23.5%;
+  background-color: #272727;
+  border: none;
+  border-radius: 0.83vw;
+  z-index: -1;
+  bottom: 0;
+}
+
+// z-indexes are supposed to dissapear
+
+@media screen and (max-width: 1439px) {
+  .registerContainer {
+    width: 55vw;
+    height: 28vw;
+  }
+
+}
+
+@media screen and (max-width: 1023px) {
+  .registerContainer {
+    width: 70vw;
+    height: 39.5vw;
+  }
+
+  .dodoLogo {
+    width: 5.5vw;
+  }
+
+  .registerForm {
+    padding: 5vw 3.5vw;
+    margin-bottom: 70vw;
+  }
+
+  .registerForm input {
+    padding: 1.245vw;
+    margin: 0.63vw 0;
+    font-size: 1.39vw;
+    border-radius: 1.245vw;
+    height: 1.245vw;
+  }
+
+  .registerButton {
+    margin-top: 1.245vw;
+    padding: 0.63vw;
+    font-size: 1.56vw;
+    border-radius: 0.87vw;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .registerContainer {
+    width: 100%;
+    height: 100%;
+    flex-direction: column-reverse;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .topMobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dodoNameMobile {
+    color: #828282;
+    font-size: 12vw;
+    font-weight: 600;
+  }
+
+  .hrLineMobile {
+    width: 45vw;
+    margin: 2vh 0 2vh 0;
+    border: solid 1px #fff;
+    border-radius: 2px;
+  }
+
+  .registerForm {
+    width: 63.7%;
+    text-align: center;
+  }
+
+  .registerForm input {
+    padding: 2.8vw;
+    margin: 0.8vh 0;
+    font-size: 3vw;
+    border-radius: 2vw;
+    height: 2.8vw;
+    text-align: center;
+  }
+
+  .registerButton {
+    margin-top: 2.2vh;
+    padding: 1.25vw 5vw;
+    font-size: 3.5vw;
+    border-radius: 1.8vw;
+  }
+
+  .dodoLogo {
+    display: none;
+  }
+
+  .middleBar {
+    display: none;
+  }
+
+  .bottomBlock {
+    height: 28vh;
+    border-radius: 2vw;
+  }
+}

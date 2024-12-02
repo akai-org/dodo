@@ -12,6 +12,7 @@ import ToDoListFold from '../pages/settings/ToDoListFold.tsx';
 import NotesFold from '../pages/settings/NotesFold.tsx';
 import ProfileFold from '../pages/settings/ProfileFold.tsx';
 import ToDoList from '../pages/todolist/ToDoList.tsx';
+import Register from '../pages/register/Register.tsx';
 
 export const router = createBrowserRouter([
     {
@@ -70,5 +71,9 @@ export const router = createBrowserRouter([
     {
         path: Route.NOT_FOUND,
         element: withGuard(<NotFound />),
+    },
+    {
+        path: Route.REGISTER,
+        element: withGuard(<Register />),
     },
 ]);

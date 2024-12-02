@@ -9,7 +9,7 @@ interface LayoutProps {
     children?: ReactElement;
 }
 
-const DISABLE_NAVBAR = [Route.LOGIN];
+const DISABLE_NAVBAR = [Route.LOGIN, Route.REGISTER];
 
 const Layout: FC<LayoutProps> = ({ children }): ReactElement => {
     const { theme } = useThemeStore();
