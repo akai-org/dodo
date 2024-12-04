@@ -55,7 +55,6 @@ const useAuthApi = () => {
             const { accessToken } = res.data;
 
             if (accessToken) {
-                console.log(accessToken);
                 setAccessToken(accessToken);
                 axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
             } else {
