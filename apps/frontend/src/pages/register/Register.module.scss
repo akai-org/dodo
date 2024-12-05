@@ -52,13 +52,23 @@
   background-color: #fff;
   border: none;
   padding: 0.83vw;
-  margin: 0.42vw 0;
+  margin: 0.42vw 0 0 0;
   font-size: 0.93vw;
   font-family: inherit;
   border-radius: 0.83vw;
   width: 90%;
   height: 0.83vw;
 }
+
+.formErrors {
+  color: red;
+  font-size: 0.6vw;
+  height: 0.6vw;
+  text-align: left;
+  width: 100%;
+  margin-left: 15px;
+}
+
 
 ::placeholder {
   color: #424242;
@@ -117,6 +127,11 @@
     padding: 5vw 3.5vw;
   }
 
+  .formErrors {
+    font-size: 1.1vw;
+    height: 1.1vw;
+  }
+
   .registerForm input {
     padding: 1.245vw;
     margin: 0.63vw 0;
@@ -166,6 +181,12 @@
     width: 63.7%;
     text-align: center;
     margin-bottom: 70vw;
+  }
+
+  .formErrors {
+    font-size: 2.5vw;
+    margin-left: 5px;
+    height: 2.5vw;
   }
 
   .registerForm input {

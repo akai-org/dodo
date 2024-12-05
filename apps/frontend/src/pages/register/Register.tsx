@@ -1,23 +1,31 @@
 import { ChangeEvent, FC, FormEvent, ReactElement, useState } from 'react';
 import styles from './Register.module.scss';
+import {
+    RegisterForm,
+    RegisterValidationErrors,
+} from '../../auth/auth.types.ts';
+import useAuthApi from '../../api/useAuthApi.tsx';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router';
+import { Route } from '../../router/router.types.ts';
+import { registerFormValidator } from '../../auth/auth.utils.ts';
+
 const initialFormState = {
     username: '',
     email: '',
     password: '',
 };
-// This interface is temporary
-interface RegisterForm {
-    username: string;
-    email: string;
-    password: string;
-}
 
 const Register: FC = (): ReactElement => {
     const [form, setForm] = useState<RegisterForm>(initialFormState);
+    const [formErrors, setFormErrors] = useState<RegisterValidationErrors>({});
+    const { useRegister } = useAuthApi();
+    const registerQuery = useRegister();
+    const navigate = useNavigate();
 
     const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const userName = event.target.value;
-        setForm((prevState) => ({ ...prevState, userName }));
+        const username = event.target.value;
+        setForm((prevState) => ({ ...prevState, username }));
     };
 
     const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +40,20 @@ const Register: FC = (): ReactElement => {
 
     const handleRegister = async (event: FormEvent) => {
         event.preventDefault();
-        // TODO: Add register logic as soon as the backend is ready
+        setFormErrors(registerFormValidator(form));
+        // registerQuery
+        //     .mutateAsync(form)
+        //     .then(() => {
+        //         toast('Register success, redirecting you to home page', {
+        //             type: 'success',
+        //         });
+        //         setTimeout(() => {
+        //             navigate(Route.HOME);
+        //         }, 2000);
+        //     })
+        //     .catch(() => {
+        //         toast('Register failed', { type: 'error' });
+        //     });
     };
 
     return (
@@ -51,18 +72,21 @@ const Register: FC = (): ReactElement => {
                         value={form.username}
                         onChange={handleUsernameChange}
                     />
+                    <p className={styles.formErrors}>{formErrors.username}</p>
                     <input
                         type="text"
                         placeholder="Email"
                         value={form.email}
                         onChange={handleEmailChange}
                     />
+                    <p className={styles.formErrors}>{formErrors.email}</p>
                     <input
                         type="password"
                         placeholder="Password"
                         value={form.password}
                         onChange={handlePasswordChange}
                     />
+                    <p className={styles.formErrors}>{formErrors.password}</p>
                     <button className={styles.registerButton} type="submit">
                         Register
                     </button>

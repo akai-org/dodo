@@ -6,6 +6,7 @@ import {
     LoginBody,
     LoginResponse,
     User,
+    RegisterBody,
 } from './api.types.ts';
 import { removeAccessToken, setAccessToken } from '../auth/auth.utils.ts';
 import { AxiosResponse } from 'axios';
@@ -14,6 +15,12 @@ const useAuthApi = () => {
     const useLogin = () =>
         useMutation(async (body: LoginBody) => {
             const response = await axios.post(AUTH_ENDPOINTS.LOGIN, body);
+            return handleResponse(response);
+        });
+
+    const useRegister = () =>
+        useMutation(async (body: RegisterBody) => {
+            const response = await axios.post(AUTH_ENDPOINTS.REGISTER, body);
             return handleResponse(response);
         });
 
@@ -69,7 +76,7 @@ const useAuthApi = () => {
         });
     };
 
-    return { useLogin, useAuthenticateByGoogle, useCurrentUser };
+    return { useLogin, useAuthenticateByGoogle, useCurrentUser, useRegister };
 };
 
 export default useAuthApi;
