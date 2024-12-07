@@ -44,7 +44,7 @@ const Register: FC = (): ReactElement => {
         registerQuery
             .mutateAsync(form)
             .then(() => {
-                toast('Register success, redirecting you to home page', {
+                toast('Registered successfully, redirecting you to home page', {
                     type: 'success',
                 });
                 setTimeout(() => {
@@ -119,7 +119,12 @@ const Register: FC = (): ReactElement => {
                             className={styles.dodoLogo}
                         />
                     </div>
-                    <p>Just one more step before you can use the app.</p>
+                    <p>Just one more step</p>
+                    <p>before you can use the app.</p>
+                    <p className={styles.bottomSentence}>
+                        Complete your registration <br></br>to gain access to
+                        all the features.
+                    </p>
                 </div>
 
                 <div className={styles.topMobile}>

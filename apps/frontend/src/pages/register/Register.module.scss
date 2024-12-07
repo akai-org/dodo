@@ -25,7 +25,6 @@
   align-items: flex-start;
   justify-content: center;
   width: 38%;
-  height: 100%;
   margin-right: 2.5vw;
 }
 
@@ -33,9 +32,13 @@
   display: flex;
   flex-direction: column;
   width: 56%;
-  height: 100%;
-  font-size: 2vw;
+  font-size: 1.66vw;
   padding: 3.33vw 2.5vw;
+  font-weight: 300;
+}
+
+.bottomSentence {
+  margin-top: 1.5vw;
 }
 
 .login {
@@ -66,7 +69,7 @@
 }
 
 .dodoName {
-  font-size: 2.56vw;
+  font-size: 2.5vw;
 }
 
 .registerForm {
