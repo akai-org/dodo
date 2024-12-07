@@ -17,35 +17,64 @@
   height: 25.5vw;
   border-radius: 0.83vw;
   z-index: 2;
-  align-items: center;
+}
+
+.leftSide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: center;
+  width: 38%;
+  height: 100%;
+  margin-right: 2.5vw;
+}
+
+.rightSide {
+  display: flex;
+  flex-direction: column;
+  width: 56%;
+  height: 100%;
+  font-size: 2vw;
+  padding: 3.33vw 2.5vw;
+}
+
+.login {
+  color: #828282;
+  font-size: 0.75vw;
+  margin-top: 0.5vw;
+}
+
+.loginLink {
+  color: #828282;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .topMobile {
   display: none;
 }
 
+.dodo {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2vw;
+}
+
 .dodoLogo {
   width: 3.5vw;
-  position: absolute;
-  top: 25px;
-  right: 50px;
+  margin-left: 50px;
 }
 
 .dodoName {
-  color: #828282;
-  position: absolute;
-  top: 25px;
-  left: 50px;
-  font-size: 1.56vw;
+  font-size: 2.56vw;
 }
 
 .registerForm {
-  width: 38%;
-  padding: 3.33vw 2.5vw;
+  width: 90%;
+  padding: 0 2.5vw 3.33vw 2.5vw;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .registerForm input {
@@ -66,7 +95,15 @@
   height: 0.6vw;
   text-align: left;
   width: 100%;
-  margin-left: 15px;
+  margin-left: 5px;
+}
+
+.middleBar {
+  background-color: #d9d9d9;
+  border: none;
+  margin: 5% 0;
+  padding: 5px;
+  border-radius: 0.83vw;
 }
 
 
@@ -124,7 +161,7 @@
   }
 
   .registerForm {
-    padding: 5vw 3.5vw;
+    padding: 0 3.5vw 5vw 3.5vw;
   }
 
   .formErrors {
@@ -157,6 +194,10 @@
     align-items: center;
   }
 
+  .rightSide {
+    display: none;
+  }
+
   .topMobile {
     display: flex;
     flex-direction: column;
@@ -177,10 +218,18 @@
     border-radius: 2px;
   }
 
-  .registerForm {
+  .leftSide {
     width: 63.7%;
     text-align: center;
     margin-bottom: 70vw;
+  }
+
+  .registerForm {
+    align-items: center;
+  }
+
+  .login {
+    font-size: 3vw;
   }
 
   .formErrors {
@@ -196,6 +245,7 @@
     border-radius: 2vw;
     height: 2.8vw;
     text-align: center;
+    width: 100%;
   }
 
   .registerButton {
@@ -203,6 +253,7 @@
     padding: 1.25vw 5vw;
     font-size: 3.5vw;
     border-radius: 1.8vw;
+    width: 100%;
   }
 
   .dodoLogo {

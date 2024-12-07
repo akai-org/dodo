@@ -127,6 +127,21 @@ const Login: FC = (): ReactElement => {
                             Login
                         </button>
                     </form>
+                    <div className={styles.register}>
+                        Don't have an account yet?
+                        <p>
+                            Click{' '}
+                            <span
+                                onClick={() => {
+                                    navigate(Route.REGISTER);
+                                }}
+                                className={styles.registerLink}
+                            >
+                                here
+                            </span>{' '}
+                            to register.
+                        </p>
+                    </div>
                 </div>
                 <div className={styles.topMobile}>
                     <p className={styles.dodoNameMobile}>DoDo</p>

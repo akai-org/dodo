@@ -55,7 +55,7 @@ const useAuthApi = () => {
         res: AxiosResponse<LoginResponse>,
     ): Promise<LoginResponse> => {
         return new Promise<never>((resolve, reject) => {
-            if (res.status !== 200) {
+            if (res.status !== 200 && res.status !== 201) {
                 reject('Error');
             }
 

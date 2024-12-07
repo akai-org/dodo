@@ -41,56 +41,86 @@ const Register: FC = (): ReactElement => {
     const handleRegister = async (event: FormEvent) => {
         event.preventDefault();
         setFormErrors(registerFormValidator(form));
-        // registerQuery
-        //     .mutateAsync(form)
-        //     .then(() => {
-        //         toast('Register success, redirecting you to home page', {
-        //             type: 'success',
-        //         });
-        //         setTimeout(() => {
-        //             navigate(Route.HOME);
-        //         }, 2000);
-        //     })
-        //     .catch(() => {
-        //         toast('Register failed', { type: 'error' });
-        //     });
+        registerQuery
+            .mutateAsync(form)
+            .then(() => {
+                toast('Register success, redirecting you to home page', {
+                    type: 'success',
+                });
+                setTimeout(() => {
+                    navigate(Route.HOME);
+                }, 2000);
+            })
+            .catch(() => {
+                toast('Register failed', { type: 'error' });
+            });
     };
 
     return (
         <div className={styles.container}>
             <div className={styles.registerContainer}>
-                <h1 className={styles.dodoName}>DoDo Register</h1>
-                <img
-                    src="/favicon.ico"
-                    alt="DoDo Logo"
-                    className={styles.dodoLogo}
-                />
-                <form className={styles.registerForm} onSubmit={handleRegister}>
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        value={form.username}
-                        onChange={handleUsernameChange}
-                    />
-                    <p className={styles.formErrors}>{formErrors.username}</p>
-                    <input
-                        type="text"
-                        placeholder="Email"
-                        value={form.email}
-                        onChange={handleEmailChange}
-                    />
-                    <p className={styles.formErrors}>{formErrors.email}</p>
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={form.password}
-                        onChange={handlePasswordChange}
-                    />
-                    <p className={styles.formErrors}>{formErrors.password}</p>
-                    <button className={styles.registerButton} type="submit">
-                        Register
-                    </button>
-                </form>
+                <div className={styles.leftSide}>
+                    <form
+                        className={styles.registerForm}
+                        onSubmit={handleRegister}
+                    >
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={form.username}
+                            onChange={handleUsernameChange}
+                        />
+                        <p className={styles.formErrors}>
+                            {formErrors.username}
+                        </p>
+                        <input
+                            type="text"
+                            placeholder="Email"
+                            value={form.email}
+                            onChange={handleEmailChange}
+                        />
+                        <p className={styles.formErrors}>{formErrors.email}</p>
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={form.password}
+                            onChange={handlePasswordChange}
+                        />
+                        <p className={styles.formErrors}>
+                            {formErrors.password}
+                        </p>
+                        <button className={styles.registerButton} type="submit">
+                            Register
+                        </button>
+                        <p className={styles.login}>
+                            Already have an account?
+                            <p>
+                                Click{' '}
+                                <span
+                                    className={styles.loginLink}
+                                    onClick={() => navigate(Route.LOGIN)}
+                                >
+                                    here
+                                </span>{' '}
+                                to login.
+                            </p>
+                        </p>
+                    </form>
+                </div>
+
+                <div className={styles.middleBar}></div>
+
+                <div className={styles.rightSide}>
+                    <div className={styles.dodo}>
+                        <h1 className={styles.dodoName}>DoDo Register</h1>
+                        <img
+                            src="/favicon.ico"
+                            alt="DoDo Logo"
+                            className={styles.dodoLogo}
+                        />
+                    </div>
+                    <p>Just one more step before you can use the app.</p>
+                </div>
 
                 <div className={styles.topMobile}>
                     <p className={styles.dodoNameMobile}>DoDo Register</p>

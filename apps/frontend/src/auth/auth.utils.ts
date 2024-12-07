@@ -59,19 +59,13 @@ export const loginFormValidator = (form: LoginForm) => {
 export const registerFormValidator = (form: RegisterForm) => {
     const errors: RegisterValidationErrors = {};
     const emailRegex = /^[\w-]{1,30}@([\w-]+\.)+[\w-]{2,4}$/g;
-    if (!form.email) {
-        errors.email = 'Email is required';
-    } else if (!emailRegex.test(form.email)) {
+    if (!emailRegex.test(form.email)) {
         errors.email = 'Email is not in a valid format';
     }
-    if (!form.password) {
-        errors.password = 'Password is required';
-    } else if (form.password.length < 8) {
+    if (form.password.length < 8) {
         errors.password = 'Password must be at least 8 characters';
     }
-    if (!form.username) {
-        errors.username = 'Username is required';
-    } else if (form.username.length < 3) {
+    if (form.username.length < 3) {
         errors.username = 'Username must be at least 3 characters';
     }
 
