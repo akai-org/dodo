@@ -69,11 +69,11 @@ export const router = createBrowserRouter([
         element: withGuard(<Login />),
     },
     {
-        path: Route.NOT_FOUND,
-        element: withGuard(<NotFound />),
-    },
-    {
         path: Route.REGISTER,
         element: withGuard(<Register />),
+    },
+    {
+        path: Route.NOT_FOUND,
+        element: withGuard(<NotFound />),
     },
 ]);

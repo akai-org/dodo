@@ -1,4 +1,5 @@
 import { ChangeEvent, FC, FormEvent, ReactElement, useState } from 'react';
+
 import styles from './Register.module.scss';
 import {
     RegisterForm,
@@ -23,24 +24,38 @@ const Register: FC = (): ReactElement => {
     const registerQuery = useRegister();
     const navigate = useNavigate();
 
+    const { usernameValidator, emailValidator, passwordValidator } =
+        registerFormValidator();
+
     const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
         const username = event.target.value;
         setForm((prevState) => ({ ...prevState, username }));
+        setFormErrors((prevState) => ({
+            ...prevState,
+            username: usernameValidator(username),
+        }));
     };
 
     const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
         const email = event.target.value;
         setForm((prevState) => ({ ...prevState, email }));
+        setFormErrors((prevState) => ({
+            ...prevState,
+            email: emailValidator(email),
+        }));
     };
 
     const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
         const password = event.target.value;
         setForm((prevState) => ({ ...prevState, password }));
+        setFormErrors((prevState) => ({
+            ...prevState,
+            password: passwordValidator(password),
+        }));
     };
 
     const handleRegister = async (event: FormEvent) => {
         event.preventDefault();
-        setFormErrors(registerFormValidator(form));
         registerQuery
             .mutateAsync(form)
             .then(() => {
@@ -69,6 +84,7 @@ const Register: FC = (): ReactElement => {
                             placeholder="Username"
                             value={form.username}
                             onChange={handleUsernameChange}
+                            required
                         />
                         <p className={styles.formErrors}>
                             {formErrors.username}
@@ -78,6 +94,7 @@ const Register: FC = (): ReactElement => {
                             placeholder="Email"
                             value={form.email}
                             onChange={handleEmailChange}
+                            required
                         />
                         <p className={styles.formErrors}>{formErrors.email}</p>
                         <input
@@ -85,6 +102,7 @@ const Register: FC = (): ReactElement => {
                             placeholder="Password"
                             value={form.password}
                             onChange={handlePasswordChange}
+                            required
                         />
                         <p className={styles.formErrors}>
                             {formErrors.password}

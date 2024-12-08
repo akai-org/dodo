@@ -1,9 +1,4 @@
-import {
-    LoginForm,
-    LoginValidationErrors,
-    RegisterForm,
-    RegisterValidationErrors,
-} from './auth.types.ts';
+import { LoginForm, LoginValidationErrors } from './auth.types.ts';
 import { jwtDecode } from 'jwt-decode';
 
 export const verifyToken = (): boolean => {
@@ -56,18 +51,28 @@ export const loginFormValidator = (form: LoginForm) => {
     return errors;
 };
 
-export const registerFormValidator = (form: RegisterForm) => {
-    const errors: RegisterValidationErrors = {};
-    const emailRegex = /^[\w-]{1,30}@([\w-]+\.)+[\w-]{2,4}$/g;
-    if (!emailRegex.test(form.email)) {
-        errors.email = 'Email is not in a valid format';
-    }
-    if (form.password.length < 8) {
-        errors.password = 'Password must be at least 8 characters';
-    }
-    if (form.username.length < 3) {
-        errors.username = 'Username must be at least 3 characters';
+export const registerFormValidator = () => {
+    function usernameValidator(login: string): string {
+        if (login.length < 3) {
+            return 'Username must be at least 3 characters long';
+        }
+        return '';
     }
 
-    return errors;
+    function emailValidator(email: string): string {
+        const emailRegex = /^[\w-]{1,30}@([\w-]+\.)+[\w-]{2,4}$/g;
+        if (!emailRegex.test(email)) {
+            return 'Email is not in a valid format';
+        }
+        return '';
+    }
+
+    function passwordValidator(password: string): string {
+        if (password.length < 8) {
+            return 'Password must be at least 8 characters long';
+        }
+        return '';
+    }
+
+    return { usernameValidator, emailValidator, passwordValidator };
 };
