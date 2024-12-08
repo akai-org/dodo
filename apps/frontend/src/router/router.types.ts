@@ -8,10 +8,11 @@ export enum Route {
     SETTINGS = '/settings',
     LOGIN = '/login',
     NOT_FOUND = '/*',
+    REGISTER = '/register',
 }
 
 export enum SETTINGS_PATH {
-    THEMES= '/themes',
+    THEMES = '/themes',
     CALENDAR = '/calendar',
     TODOLIST = '/todolist',
     NOTES = '/notes',

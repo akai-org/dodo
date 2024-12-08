@@ -6,6 +6,7 @@ import {
     LoginBody,
     LoginResponse,
     User,
+    RegisterBody,
 } from './api.types.ts';
 import { removeAccessToken, setAccessToken } from '../auth/auth.utils.ts';
 import { AxiosResponse } from 'axios';
@@ -14,6 +15,12 @@ const useAuthApi = () => {
     const useLogin = () =>
         useMutation(async (body: LoginBody) => {
             const response = await axios.post(AUTH_ENDPOINTS.LOGIN, body);
+            return handleResponse(response);
+        });
+
+    const useRegister = () =>
+        useMutation(async (body: RegisterBody) => {
+            const response = await axios.post(AUTH_ENDPOINTS.REGISTER, body);
             return handleResponse(response);
         });
 
@@ -48,14 +55,13 @@ const useAuthApi = () => {
         res: AxiosResponse<LoginResponse>,
     ): Promise<LoginResponse> => {
         return new Promise<never>((resolve, reject) => {
-            if (res.status !== 200) {
+            if (res.status !== 200 && res.status !== 201) {
                 reject('Error');
             }
 
             const { accessToken } = res.data;
 
             if (accessToken) {
-                console.log(accessToken);
                 setAccessToken(accessToken);
                 axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
             } else {
@@ -70,7 +76,7 @@ const useAuthApi = () => {
         });
     };
 
-    return { useLogin, useAuthenticateByGoogle, useCurrentUser };
+    return { useLogin, useAuthenticateByGoogle, useCurrentUser, useRegister };
 };
 
 export default useAuthApi;

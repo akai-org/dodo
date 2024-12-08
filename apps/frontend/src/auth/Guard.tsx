@@ -11,8 +11,9 @@ interface GuardProps {
 const Guard: FC<GuardProps> = ({ children }): ReactElement => {
     const { setLocationPath } = useLocationStore();
     const location = useLocation();
-    const isLogin = location.pathname === Route.LOGIN;
-
+    const isLogin =
+        location.pathname === Route.LOGIN ||
+        location.pathname === Route.REGISTER;
     const isTokenValid = verifyToken();
 
     useEffect(() => {

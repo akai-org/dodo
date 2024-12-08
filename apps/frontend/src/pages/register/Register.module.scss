@@ -1,0 +1,278 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.registerContainer {
+  position: relative;
+  display: flex;
+  background-color: #424242;
+  color: #fff;
+  width: 50vw;
+  height: 25.5vw;
+  border-radius: 0.83vw;
+  z-index: 2;
+}
+
+.leftSide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 38%;
+  margin-right: 2.5vw;
+}
+
+.rightSide {
+  display: flex;
+  flex-direction: column;
+  width: 56%;
+  font-size: 1.66vw;
+  padding: 3.33vw 2.5vw;
+  font-weight: 300;
+}
+
+.bottomSentence {
+  margin-top: 1.5vw;
+}
+
+.login {
+  color: #828282;
+  font-size: 0.75vw;
+  margin-top: 0.5vw;
+}
+
+.loginLink {
+  color: #828282;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.topMobile {
+  display: none;
+}
+
+.dodo {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 2vw;
+}
+
+.dodoLogo {
+  width: 3.5vw;
+  margin-left: 50px;
+}
+
+.dodoName {
+  font-size: 2.5vw;
+}
+
+.registerForm {
+  width: 90%;
+  padding: 0 2.5vw 3.33vw 2.5vw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.registerForm input {
+  background-color: #fff;
+  border: none;
+  padding: 0.83vw;
+  margin: 0.42vw 0 0 0;
+  font-size: 0.93vw;
+  font-family: inherit;
+  border-radius: 0.83vw;
+  width: 90%;
+  height: 0.83vw;
+}
+
+.formErrors {
+  color: red;
+  font-size: 0.6vw;
+  height: 0.6vw;
+  text-align: left;
+  width: 100%;
+  margin-left: 5px;
+}
+
+.middleBar {
+  background-color: #d9d9d9;
+  border: none;
+  margin: 5% 0;
+  padding: 5px;
+  border-radius: 0.83vw;
+}
+
+
+::placeholder {
+  color: #424242;
+}
+
+.registerButton {
+  width: 50%;
+  margin-top: 0.475vw;
+  padding: 0.42vw;
+  background-color: #828282;
+  color: white;
+  font-size: 1.04vw;
+  border: none;
+  border-radius: 0.58vw;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.registerButton:hover {
+  background-color: #a8a8a8;
+  transition: 0.25s;
+}
+
+.bottomBlock {
+  position: absolute;
+  width: 100%;
+  height: 23.5%;
+  background-color: #272727;
+  border: none;
+  border-radius: 0.83vw;
+  z-index: -1;
+  bottom: 0;
+}
+
+// z-indexes are supposed to dissapear
+
+@media screen and (max-width: 1439px) {
+  .registerContainer {
+    width: 55vw;
+    height: 28vw;
+  }
+
+}
+
+@media screen and (max-width: 1023px) {
+  .registerContainer {
+    width: 70vw;
+    height: 39.5vw;
+  }
+
+  .dodoLogo {
+    width: 5.5vw;
+  }
+
+  .registerForm {
+    padding: 0 3.5vw 5vw 3.5vw;
+  }
+
+  .formErrors {
+    font-size: 1.1vw;
+    height: 1.1vw;
+  }
+
+  .registerForm input {
+    padding: 1.245vw;
+    margin: 0.63vw 0;
+    font-size: 1.39vw;
+    border-radius: 1.245vw;
+    height: 1.245vw;
+  }
+
+  .registerButton {
+    margin-top: 1.245vw;
+    padding: 0.63vw;
+    font-size: 1.56vw;
+    border-radius: 0.87vw;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .registerContainer {
+    width: 100%;
+    height: 100%;
+    flex-direction: column-reverse;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .rightSide {
+    display: none;
+  }
+
+  .topMobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dodoNameMobile {
+    color: #828282;
+    font-size: 12vw;
+    font-weight: 600;
+  }
+
+  .hrLineMobile {
+    width: 45vw;
+    margin: 2vh 0 2vh 0;
+    border: solid 1px #fff;
+    border-radius: 2px;
+  }
+
+  .leftSide {
+    width: 63.7%;
+    text-align: center;
+    margin-bottom: 70vw;
+  }
+
+  .registerForm {
+    align-items: center;
+  }
+
+  .login {
+    font-size: 3vw;
+  }
+
+  .formErrors {
+    font-size: 2.5vw;
+    margin-left: 5px;
+    height: 2.5vw;
+  }
+
+  .registerForm input {
+    padding: 2.8vw;
+    margin: 0.8vh 0;
+    font-size: 3vw;
+    border-radius: 2vw;
+    height: 2.8vw;
+    text-align: center;
+    width: 100%;
+  }
+
+  .registerButton {
+    margin-top: 2.2vh;
+    padding: 1.25vw 5vw;
+    font-size: 3.5vw;
+    border-radius: 1.8vw;
+    width: 100%;
+  }
+
+  .dodoLogo {
+    display: none;
+  }
+
+  .dodoName {
+    display: none;
+  }
+
+  .middleBar {
+    display: none;
+  }
+
+  .bottomBlock {
+    height: 28vh;
+    border-radius: 2vw;
+  }
+}
